@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>KonferenzService Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222222;--border:#2e2e2e;
+    --accent:#e8ff47;--accent2:#47ffe0;--danger:#ff4747;
+    --text:#f0f0f0;--muted:#777;--green:#47ff8a;--orange:#ffb347;
+  }
+  body.light{--bg:#f4f4f0;--surface:#ffffff;--surface2:#eeede8;--border:#d8d6cf;--accent:#1a1a1a;--accent2:#0077cc;--danger:#cc2200;--text:#1a1a1a;--muted:#888880;--green:#1a7a40;--orange:#b85c00;}
+  body.light .btn-primary{background:#1a1a1a;color:#f4f4f0;}
+  body.light .btn-primary:hover{background:#333;}
+  body.light .nav-item.active{color:#1a1a1a;border-left-color:#1a1a1a;background:rgba(0,0,0,0.05);}
+  body.light .stat-card::after{background:#1a1a1a;}
+  body.light .stat-card.green::after{background:var(--green);}
+  body.light .stat-card.blue::after{background:var(--accent2);}
+  body.light .stat-card.orange::after{background:var(--orange);}
+  body.light .cat-tab.active{border-color:#1a1a1a;color:#1a1a1a;background:rgba(0,0,0,0.06);}
+  body.light .mob-nav-item.active{color:#1a1a1a;border-top-color:#1a1a1a;}
+  body.light .summary-box{background:rgba(0,0,0,0.04);border-color:rgba(0,0,0,0.15);}
+  body.light .login-box::before,body.light .login-box::after{border-color:#1a1a1a;}
+  body.light #session-progress{background:#1a1a1a;}
+  body.light .qty-btn:hover{background:#1a1a1a;color:#f4f4f0;}
+  body.light .page-title span{color:#555;}
+  body.light .sidebar-logo h1 span{color:#555;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  #loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
+  #loading-overlay.hidden{display:none;}
+  .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;}
+  .login-box{background:var(--surface);border:1px solid var(--border);padding:48px;width:400px;position:relative;}
+  .login-box::before{content:'';position:absolute;top:-2px;left:-2px;width:40px;height:40px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);}
+  .login-box::after{content:'';position:absolute;bottom:-2px;right:-2px;width:40px;height:40px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);}
+  .login-title{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;}
+  .login-title span{color:var(--accent);}
+  .login-sub{color:var(--muted);font-size:13px;margin-bottom:32px;font-family:'DM Mono',monospace;line-height:1.6;}
+  #app{display:none;min-height:100vh;}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;}
+  .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+  .sidebar-logo h1{font-size:16px;font-weight:800;letter-spacing:-0.3px;}
+  .sidebar-logo h1 span{color:var(--accent);}
+  .sidebar-logo p{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;line-height:1.5;}
+  .nav{flex:1;padding:16px 0;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);border-left:3px solid transparent;transition:all 0.15s;}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(232,255,71,0.05);}
+  .nav-icon{font-size:16px;width:20px;text-align:center;}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  .sidebar-user{font-weight:500;color:var(--text);font-size:12px;margin-bottom:4px;}
+  .logout-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;padding:0;margin-top:8px;}
+  .logout-btn:hover{text-decoration:underline;}
+  .main{margin-left:220px;padding:32px;min-height:100vh;}
+  #session-bar{position:fixed;top:0;left:220px;right:0;height:3px;background:var(--border);z-index:200;}
+  #session-progress{height:100%;background:var(--accent);transition:width 1s linear;}
+  #session-warning{display:none;position:fixed;top:12px;right:16px;background:var(--surface);border:1px solid var(--orange);color:var(--orange);padding:8px 14px;font-size:12px;font-family:'DM Mono',monospace;z-index:300;}
+  .view{display:none;}
+  .view.active{display:block;animation:fadeIn 0.2s ease;}
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
+  .page-title{font-size:26px;font-weight:800;letter-spacing:-0.5px;}
+  .page-title span{color:var(--accent);}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;}
+  .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+  .stat-card.green::after{background:var(--green);}
+  .stat-card.blue::after{background:var(--accent2);}
+  .stat-card.orange::after{background:var(--orange);}
+  .stat-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:8px;}
+  .stat-value{font-size:28px;font-weight:800;}
+  .table-wrap{background:var(--surface);border:1px solid var(--border);overflow:hidden;}
+  .table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .table-title{font-size:14px;font-weight:700;}
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;padding:12px 20px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:var(--surface2);}
+  td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,0.02);}
+  .badge{display:inline-block;padding:2px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:500;border-radius:2px;}
+  .badge-pending{background:rgba(255,179,71,0.15);color:var(--orange);}
+  .badge-active{background:rgba(71,255,138,0.15);color:var(--green);}
+  .badge-done{background:rgba(119,119,119,0.15);color:var(--muted);}
+  .badge-billed{background:rgba(71,255,224,0.15);color:var(--accent2);}
+  .btn{padding:9px 18px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+  .btn-primary{background:var(--accent);color:#000;}
+  .btn-primary:hover{background:#d4e83f;}
+  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+  .btn-secondary:hover{border-color:var(--accent);}
+  .btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+  .btn-danger:hover{background:rgba(255,71,71,0.1);}
+  .btn-sm{padding:5px 12px;font-size:12px;}
+  .btn-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;}
+  .btn-icon:hover{color:var(--text);}
+  .form-group{margin-bottom:18px;}
+  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;}
+  input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;font-size:13px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.15s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  select option{background:var(--surface2);}
+  textarea{resize:vertical;min-height:80px;}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);width:580px;max-width:95vw;max-height:90vh;overflow-y:auto;position:relative;}
+  .modal-lg{width:780px;}
+  .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .modal-title{font-size:16px;font-weight:800;}
+  .modal-body{padding:24px;}
+  .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+  .product-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;}
+  .product-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);}
+  .product-item-info{display:flex;flex-direction:column;}
+  .product-item-name{font-size:13px;font-weight:600;}
+  .product-item-cat{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+  .product-qty{display:flex;align-items:center;gap:8px;}
+  .qty-btn{width:26px;height:26px;background:var(--border);border:none;color:var(--text);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+  .qty-btn:hover{background:var(--accent);color:#000;}
+  .qty-display{width:36px;text-align:center;font-family:'DM Mono',monospace;font-size:13px;}
+  .billing-item{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .billing-item:last-child{border-bottom:none;}
+  .billing-item input{padding:6px 10px;}
+  .cat-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .cat-tab{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;}
+  .cat-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.05);}
+  .settings-section{background:var(--surface);border:1px solid var(--border);margin-bottom:20px;}
+  .settings-section-header{padding:14px 20px;border-bottom:1px solid var(--border);font-size:13px;font-weight:700;color:var(--accent);font-family:'DM Mono',monospace;text-transform:uppercase;}
+  .settings-body{padding:20px;}
+  .chip-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .chip{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--surface2);border:1px solid var(--border);font-size:12px;font-family:'DM Mono',monospace;}
+  .chip-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;line-height:1;}
+  .theme-toggle{background:none;border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:16px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin-top:10px;font-family:monospace;}
+  .theme-toggle:hover{border-color:var(--text);color:var(--text);}
+  #mobile-topbar .theme-toggle{margin-top:0;font-size:15px;width:30px;height:30px;}
+  .divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+  .text-muted{color:var(--muted);font-size:12px;}
+  .text-accent{color:var(--accent);}
+  .text-green{color:var(--green);}
+  .text-danger{color:var(--danger);}
+  .flex{display:flex;}
+  .gap-2{gap:8px;}
+  .summary-box{background:rgba(232,255,71,0.05);border:1px solid rgba(232,255,71,0.2);padding:14px 18px;margin-top:16px;}
+  .summary-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;}
+  .filter-bar{display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap;}
+  .filter-bar input,.filter-bar select{width:auto;min-width:160px;}
+  .export-row{display:flex;gap:10px;align-items:center;}
+  #sync-indicator{position:fixed;bottom:16px;right:16px;background:var(--surface);border:1px solid var(--border);padding:6px 12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);z-index:400;display:none;}
+  #sync-indicator.saving{border-color:var(--orange);color:var(--orange);display:block;}
+  #sync-indicator.saved{border-color:var(--green);color:var(--green);display:block;}
+  #sync-indicator.error{border-color:var(--danger);color:var(--danger);display:block;}
+  .empty{text-align:center;padding:40px;color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--surface);}
+  ::-webkit-scrollbar-thumb{background:var(--border);}
+  ::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  @media(min-width:601px)and(max-width:1024px){
+    .sidebar{width:64px;overflow:visible;transition:width 0.2s ease;}
+    .sidebar:hover{width:200px;z-index:200;box-shadow:4px 0 24px rgba(0,0,0,0.6);}
+    .sidebar-logo p,.sidebar-logo h1 .logo-text,.nav-item .nav-label,
+    .sidebar-footer .sidebar-user,.sidebar-footer .logout-btn,.sidebar-footer #session-timer-display{display:none;}
+    .sidebar:hover .sidebar-logo p,.sidebar:hover .nav-item .nav-label,
+    .sidebar:hover .sidebar-footer .sidebar-user,.sidebar:hover .sidebar-footer .logout-btn,
+    .sidebar:hover .sidebar-footer #session-timer-display{display:block;}
+    .sidebar-logo{padding:20px 0;display:flex;flex-direction:column;align-items:center;}
+    .sidebar:hover .sidebar-logo{align-items:flex-start;padding:20px 16px;}
+    .sidebar-logo h1{font-size:13px;white-space:nowrap;}
+    .nav-item{padding:12px 0;justify-content:center;gap:0;border-left:3px solid transparent;}
+    .sidebar:hover .nav-item{padding:11px 16px;justify-content:flex-start;gap:10px;}
+    .nav-icon{font-size:18px;width:auto;}
+    .sidebar-footer{padding:12px 0;display:flex;flex-direction:column;align-items:center;}
+    .sidebar:hover .sidebar-footer{align-items:flex-start;padding:12px 16px;}
+    .main{margin-left:64px;padding:24px;}
+    #session-bar{left:64px;}
+    .stats-grid{grid-template-columns:1fr 1fr;gap:12px;}
+    .stat-value{font-size:24px;}
+    .form-row3{grid-template-columns:1fr 1fr;}
+    .page-header{flex-wrap:wrap;gap:10px;margin-bottom:24px;}
+    .page-title{font-size:22px;}
+    .modal{width:min(580px,90vw);}
+    .modal-lg{width:min(740px,94vw);}
+    .filter-bar{flex-wrap:wrap;}
+    .filter-bar input,.filter-bar select{min-width:140px;font-size:13px;}
+    .cat-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .cat-tabs::-webkit-scrollbar{display:none;}
+    .cat-tab{white-space:nowrap;flex-shrink:0;}
+    #mobile-topbar{display:none!important;}
+    #mobile-bottomnav{display:none!important;}
+    #mobile-mehr-nav{display:none!important;}
+  }
+
+  @media(max-width:600px){
+    body{font-size:15px;-webkit-text-size-adjust:100%;}
+    .login-box{width:calc(100vw - 32px);padding:32px 24px;margin:0 16px;}
+    .sidebar{display:none!important;}
+    #session-bar{left:0;}
+    #session-warning{top:auto;bottom:calc(64px + env(safe-area-inset-bottom) + 8px);right:12px;left:12px;font-size:11px;}
+    .main{margin-left:0;padding:16px;padding-top:calc(56px + env(safe-area-inset-top));padding-bottom:calc(72px + env(safe-area-inset-bottom));}
+    #mobile-topbar{display:flex!important;position:fixed;top:0;left:0;right:0;height:calc(52px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);padding-left:16px;padding-right:16px;background:var(--surface);border-bottom:1px solid var(--border);align-items:center;justify-content:space-between;z-index:150;}
+    #mobile-topbar h1{font-size:15px;font-weight:800;}
+    #mobile-topbar h1 span{color:var(--accent);}
+    #mobile-topbar-right{display:flex;align-items:center;gap:10px;}
+    #mobile-session-display{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
+    #mobile-bottomnav{display:flex!important;position:fixed;bottom:0;left:0;right:0;height:calc(56px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--surface);border-top:1px solid var(--border);z-index:150;}
+    .mob-nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--muted);font-size:9px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.3px;padding-bottom:4px;border-top:2px solid transparent;transition:all 0.15s;-webkit-tap-highlight-color:transparent;}
+    .mob-nav-item.active{color:var(--accent);border-top-color:var(--accent);}
+    .mob-nav-icon{font-size:18px;line-height:1;}
+    .page-header{flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:20px;}
+    .page-title{font-size:22px;}
+    .export-row{width:100%;}
+    .export-row .btn,.page-header>.btn{width:100%;text-align:center;}
+    .stats-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+    .stat-card{padding:14px;}
+    .stat-value{font-size:22px;}
+    .stat-label{font-size:10px;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap){border:none;background:transparent;overflow:visible;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) table,
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) thead,
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) tbody,
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) th,
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) td,
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) tr{display:block;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) thead{display:none;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) tr{background:var(--surface);border:1px solid var(--border);margin-bottom:8px;padding:12px 14px;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) tr:hover td{background:transparent;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) td{padding:3px 0;border-bottom:none;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) td:empty{display:none;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) td .flex{justify-content:flex-end;}
+    .table-wrap:not(#products-table-wrap):not(#bookings-table-wrap) td .badge{font-size:10px;}
+    .filter-bar{flex-direction:column;gap:8px;}
+    .filter-bar input,.filter-bar select{width:100%;min-width:unset;font-size:15px;padding:10px 12px;}
+    .form-row,.form-row3{grid-template-columns:1fr;gap:0;}
+    input,select,textarea{font-size:16px;padding:11px 12px;}
+    label{font-size:11px;}
+    .modal-overlay{align-items:flex-end;}
+    .modal,.modal.modal-lg{width:100%;max-width:100%;max-height:92vh;border-bottom:none;}
+    .modal-header{padding:16px 20px;}
+    .modal-body{padding:16px 20px;}
+    .modal-footer{padding:12px 20px calc(12px + env(safe-area-inset-bottom));flex-direction:column-reverse;}
+    .modal-footer .btn{width:100%;text-align:center;padding:12px;}
+    .billing-item{grid-template-columns:1fr 1fr;row-gap:6px;}
+    .billing-item>div:nth-child(1){grid-column:1/-1;}
+    .btn{padding:11px 16px;min-height:44px;}
+    .btn-sm{padding:8px 12px;min-height:36px;font-size:12px;}
+    .qty-btn{width:34px;height:34px;font-size:18px;}
+    .cat-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+    .cat-tabs::-webkit-scrollbar{display:none;}
+    .cat-tab{white-space:nowrap;padding:7px 14px;font-size:12px;flex-shrink:0;}
+    .product-list{max-height:45vh;}
+    .chip{padding:7px 10px;font-size:13px;}
+    .summary-box{margin-top:12px;}
+    .settings-body{padding:14px 16px;}
+    .empty{padding:24px;font-size:12px;}
+    #sync-indicator{bottom:calc(72px + env(safe-area-inset-bottom) + 8px);}
+  }
+</style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Verbinde mit Datenbank...</div>
+</div>
+<div id="sync-indicator"></div>
+
+<div id="login-screen" style="display:none">
+  <div class="login-box">
+    <div class="login-title">Konferenz<span>Service</span></div>
+    <div class="login-sub">// Dashboard v2.0<br>// Stand 21.04.2025 14:30</div>
+    <div class="form-group"><label>Benutzername</label><input type="text" id="login-user" placeholder="Name eingeben" /></div>
+    <div class="form-group"><label>PIN</label><input type="password" id="login-pin" placeholder="••••" maxlength="6" /></div>
+    <div id="login-error" style="color:var(--danger);font-size:12px;font-family:'DM Mono',monospace;margin-bottom:12px;display:none;">Ungültige Zugangsdaten.</div>
+    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">Anmelden</button>
+  </div>
+</div>
+
+<div id="mobile-topbar" style="display:none">
+  <h1>Konferenz<span>Service</span></h1>
+  <div id="mobile-topbar-right">
+    <span id="mobile-session-display"></span>
+    <button class="theme-toggle" onclick="toggleTheme()">◐</button>
+    <button class="logout-btn" onclick="doLogout()" style="font-size:12px;margin:0">Abmelden</button>
+  </div>
+</div>
+
+<div id="session-bar"><div id="session-progress" style="width:100%"></div></div>
+<div id="session-warning">Sitzung läuft ab in <span id="warn-secs">60</span>s — <a href="#" onclick="resetSession();return false;" style="color:var(--accent)">Verlängern</a></div>
+
+<div id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>K<span class="logo-text">onferenz</span><span style="color:var(--accent)">S</span><span class="logo-text" style="color:var(--accent)">ervice</span></h1>
+      <p>// v2.0<br>// 21.04.2025 14:30</p>
+    </div>
+    <nav class="nav">
+      <div class="nav-item active" onclick="showView('overview')" data-view="overview"><span class="nav-icon">◈</span><span class="nav-label"> Übersicht</span></div>
+      <div class="nav-item" onclick="showView('bookings')" data-view="bookings"><span class="nav-icon">◉</span><span class="nav-label"> Buchungen</span></div>
+      <div class="nav-item" onclick="showView('billing')" data-view="billing"><span class="nav-icon">◎</span><span class="nav-label"> Abrechnung</span></div>
+      <div class="nav-item" onclick="showView('products')" data-view="products"><span class="nav-icon">◧</span><span class="nav-label"> Produkte</span></div>
+      <div class="nav-item" onclick="showView('stammdaten')" data-view="stammdaten"><span class="nav-icon">◫</span><span class="nav-label"> Stammdaten</span></div>
+      <div class="nav-item" onclick="showView('settings')" data-view="settings"><span class="nav-icon">◌</span><span class="nav-label"> Einstellungen</span></div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="sidebar-username">—</div>
+      <div id="session-timer-display" style="font-size:11px;color:var(--muted);">—</div>
+      <button class="logout-btn" onclick="doLogout()">Abmelden</button>
+      <button class="theme-toggle" onclick="toggleTheme()">◐</button>
+    </div>
+  </div>
+
+  <div id="mobile-bottomnav" style="display:none">
+    <div class="mob-nav-item active" onclick="showView('overview')" data-mobview="overview"><span class="mob-nav-icon">◈</span><span>Übersicht</span></div>
+    <div class="mob-nav-item" onclick="showView('bookings')" data-mobview="bookings"><span class="mob-nav-icon">◉</span><span>Buchungen</span></div>
+    <div class="mob-nav-item" onclick="showView('billing')" data-mobview="billing"><span class="mob-nav-icon">◎</span><span>Abrechnung</span></div>
+    <div class="mob-nav-item" onclick="showView('products')" data-mobview="products"><span class="mob-nav-icon">◧</span><span>Produkte</span></div>
+    <div class="mob-nav-item" onclick="showView('stammdaten')" data-mobview="stammdaten"><span class="mob-nav-icon">◫</span><span>Mehr</span></div>
+  </div>
+
+  <div class="main">
+    <div class="view active" id="view-overview">
+      <div class="page-header"><div class="page-title">Über<span>sicht</span></div><button class="btn btn-primary" onclick="openBookingModal()">+ Neue Buchung</button></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Buchungen Heute</div><div class="stat-value" id="stat-today">0</div></div>
+        <div class="stat-card green"><div class="stat-label">Aktive Buchungen</div><div class="stat-value" id="stat-active">0</div></div>
+        <div class="stat-card orange"><div class="stat-label">Offen / Abrechnen</div><div class="stat-value" id="stat-pending">0</div></div>
+        <div class="stat-card blue"><div class="stat-label">Umsatz (Monat)</div><div class="stat-value" id="stat-revenue">0 €</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header"><div class="table-title">Heutige Buchungen</div></div>
+        <table><thead><tr><th>Raum</th><th>Datum / Zeit</th><th>Kostenstelle</th><th>Produkte</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <tbody id="today-tbody"><tr><td colspan="6" class="empty">Keine Buchungen heute.</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div class="view" id="view-bookings">
+      <div class="page-header">
+        <div class="page-title">Bu<span>chungen</span></div>
+        <div class="export-row"><button class="btn btn-secondary" onclick="exportCSV()">CSV Export</button><button class="btn btn-primary" onclick="openBookingModal()">+ Neue Buchung</button></div>
+      </div>
+      <div class="filter-bar">
+        <input type="date" id="filter-date" onchange="renderBookings()" />
+        <select id="filter-room" onchange="renderBookings()"><option value="">Alle Räume</option></select>
+        <select id="filter-ks" onchange="renderBookings()"><option value="">Alle Kostenstellen</option></select>
+        <select id="filter-status" onchange="renderBookings()">
+          <option value="">Alle Status</option><option value="pending">Ausstehend</option>
+          <option value="active">Aktiv</option><option value="done">Abgeschlossen</option><option value="billed">Abgerechnet</option>
+        </select>
+      </div>
+      <div class="table-wrap" id="bookings-table-wrap" style="overflow-x:auto;">
+        <table style="min-width:700px;"><thead><tr><th>ID</th><th>Raum</th><th>Datum</th><th>Von</th><th>Bis</th><th>Kostenstelle</th><th>Produkte</th><th>Status</th><th style="position:sticky;right:0;background:var(--surface2);">Aktionen</th></tr></thead>
+        <tbody id="bookings-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="view" id="view-billing">
+      <div class="page-header"><div class="page-title">Ab<span>rechnung</span></div></div>
+      <div class="filter-bar">
+        <select id="billing-filter-status" onchange="renderBillingList()"><option value="">Alle</option><option value="done">Abzurechnen</option><option value="billed">Abgerechnet</option></select>
+        <input type="month" id="billing-filter-month" onchange="renderBillingList()" />
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>ID</th><th>Raum</th><th>Datum</th><th>Kostenstelle</th><th>Best. Gesamt</th><th>Status</th><th>Aktionen</th></tr></thead><tbody id="billing-tbody"></tbody></table></div>
+    </div>
+
+    <div class="view" id="view-products">
+      <div class="page-header">
+        <div class="page-title">Pro<span>dukte</span></div>
+        <div class="flex gap-2">
+          <input type="file" id="csv-import-input" accept=".csv" style="display:none" onchange="importProductCSV(event)" />
+          <button class="btn btn-secondary" onclick="document.getElementById('csv-import-input').click()">CSV Import</button>
+          <button class="btn btn-primary" onclick="openProductModal()">+ Neues Produkt</button>
+        </div>
+      </div>
+      <div id="import-result" style="display:none;margin-bottom:16px;padding:10px 14px;font-size:12px;font-family:'DM Mono',monospace;border:1px solid var(--border);"></div>
+      <input type="text" id="prod-search" placeholder="Suche nach Name oder PLU..." oninput="renderProducts()" style="margin-bottom:12px;" />
+      <div class="cat-tabs" id="product-cat-tabs"></div>
+      <div class="table-wrap" id="products-table-wrap" style="overflow-x:auto;">
+        <table style="min-width:600px;"><thead><tr><th>PLU</th><th>Name</th><th>Kategorie</th><th>Einheit</th><th>Preis / Einheit</th><th style="position:sticky;right:0;background:var(--surface2);">Aktionen</th></tr></thead>
+        <tbody id="products-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="view" id="view-stammdaten">
+      <div class="page-header"><div class="page-title">Stamm<span>daten</span></div></div>
+      <div id="mobile-mehr-nav" style="display:none;margin-bottom:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="showView('stammdaten');document.getElementById('mobile-mehr-nav').style.display='flex'">Stammdaten</button>
+          <button class="btn btn-secondary btn-sm" onclick="showView('settings')">Einstellungen</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><div class="settings-section"><div class="settings-section-header">Konferenzräume</div><div class="settings-body">
+          <div class="flex gap-2"><input type="text" id="new-room" placeholder="Raumname" style="flex:1" /><button class="btn btn-primary btn-sm" onclick="addRoom()">+</button></div>
+          <div class="chip-list" id="room-chips"></div>
+        </div></div></div>
+        <div><div class="settings-section"><div class="settings-section-header">Kostenstellen</div><div class="settings-body">
+          <div class="flex gap-2"><input type="text" id="new-ks" placeholder="Kostenstelle" style="flex:1" /><button class="btn btn-primary btn-sm" onclick="addKostenstelle()">+</button></div>
+          <div class="chip-list" id="ks-chips"></div>
+        </div></div></div>
+      </div>
+      <div class="settings-section"><div class="settings-section-header">Produktkategorien</div><div class="settings-body">
+        <div class="flex gap-2"><input type="text" id="new-cat" placeholder="Kategoriename" style="flex:1;max-width:280px" /><button class="btn btn-primary btn-sm" onclick="addCategory()">+</button></div>
+        <div class="chip-list" id="cat-chips"></div>
+      </div></div>
+    </div>
+
+    <div class="view" id="view-settings">
+      <div class="page-header"><div class="page-title">Ein<span>stellungen</span></div></div>
+      <div id="mobile-mehr-nav-settings" style="display:none;margin-bottom:16px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="showView('stammdaten')">Stammdaten</button>
+          <button class="btn btn-secondary btn-sm" onclick="showView('settings');document.getElementById('mobile-mehr-nav-settings').style.display='flex'">Einstellungen</button>
+        </div>
+      </div>
+      <div class="settings-section"><div class="settings-section-header">Sitzung</div><div class="settings-body">
+        <div class="form-group" style="max-width:320px"><label>Automatische Abmeldung nach (Minuten)</label><input type="number" id="setting-timeout" min="1" max="480" value="30" onchange="saveSettingsToDB()" /></div>
+        <div class="text-muted">Standard: 30 Minuten. Aktivität verlängert die Sitzung automatisch.</div>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-header">Benutzer</div><div class="settings-body">
+        <div class="table-wrap" style="border:none"><table><thead><tr><th>Benutzer</th><th>Rolle</th><th>Aktionen</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
+        <div style="margin-top:16px"><button class="btn btn-secondary btn-sm" onclick="openUserModal()">+ Benutzer hinzufügen</button></div>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-header">Schnellauswahl</div><div class="settings-body">
+        <div class="text-muted" style="margin-bottom:12px;">Produkte im Buchungsdialog als fixer Block oben. Reihenfolge per Drag & Drop.</div>
+        <div class="flex gap-2" style="margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+          <select id="qs-prod-select" style="flex:1;min-width:180px;max-width:280px;"></select>
+          <button class="btn btn-primary btn-sm" onclick="addQuickSelect()">+ Hinzufügen</button>
+        </div>
+        <div id="qs-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-header">Daten</div><div class="settings-body">
+        <button class="btn btn-secondary" onclick="exportCSV()">Buchungen CSV exportieren</button>
+        <div id="admin-migration-section" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px;">LocalStorage → Supabase Migration</div>
+          <div class="text-muted" style="margin-bottom:14px;">Lokale Daten aus der alten Version exportieren und in Supabase importieren. Nur einmalig nötig.</div>
+          <div class="flex gap-2" style="flex-wrap:wrap;margin-bottom:12px;">
+            <button class="btn btn-secondary" onclick="exportLocalStorage()">1. Lokale Daten exportieren (JSON)</button>
+            <div style="position:relative;">
+              <input type="file" id="ls-import-input" accept=".json" style="display:none" onchange="importToSupabase(event)" />
+              <button class="btn btn-secondary" onclick="document.getElementById('ls-import-input').click()">2. JSON in Supabase importieren</button>
+            </div>
+          </div>
+          <div id="migration-log" style="display:none;background:var(--surface2);border:1px solid var(--border);padding:12px;font-size:11px;font-family:'DM Mono',monospace;max-height:200px;overflow-y:auto;line-height:1.8;"></div>
+        </div>
+        <div class="text-muted" style="margin-top:10px;">Daten werden in Supabase gespeichert und sind für alle Nutzer verfügbar.</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="booking-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="booking-modal-title">Neue Buchung</div><button class="btn-icon" onclick="closeModal('booking-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Konferenzraum</label><select id="bk-room"></select></div>
+        <div class="form-group"><label>Kostenstelle</label><select id="bk-ks"></select></div>
+      </div>
+      <div class="form-row3">
+        <div class="form-group"><label>Datum</label><input type="date" id="bk-date" /></div>
+        <div class="form-group"><label>Von</label><input type="time" id="bk-from" /></div>
+        <div class="form-group"><label>Bis</label><input type="time" id="bk-to" /></div>
+      </div>
+      <div class="form-group"><label>Bemerkung</label><textarea id="bk-note" placeholder="Optional..."></textarea></div>
+      <hr class="divider">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Produkte auswählen</div>
+      <div id="bk-quickselect" style="margin-bottom:12px;"></div>
+      <input type="text" id="bk-search" placeholder="Suche nach Name..." oninput="renderBkProducts()" style="margin-bottom:10px;" />
+      <div class="cat-tabs" id="bk-cat-tabs"></div>
+      <div class="product-list" id="bk-product-list"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('booking-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveBooking()">Buchung speichern</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="product-modal-title">Neues Produkt</div><button class="btn-icon" onclick="closeModal('product-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Produktname</label><input type="text" id="prod-name" placeholder="z.B. Mineralwasser 0,5l" /></div>
+        <div class="form-group"><label>PLU *</label><input type="text" id="prod-plu" placeholder="z.B. 1001" /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Kategorie</label><select id="prod-cat"></select></div>
+        <div class="form-group"><label>Einheit</label><input type="text" id="prod-unit" placeholder="Stück / Flasche / Tasse" /></div>
+      </div>
+      <div class="form-group"><label>Preis pro Einheit (€)</label><input type="number" id="prod-price" step="0.01" min="0" placeholder="0.00" /></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('product-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveProduct()">Speichern</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="billing-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">Abrechnung erfassen</div><button class="btn-icon" onclick="closeModal('billing-modal')">✕</button></div>
+    <div class="modal-body">
+      <div id="billing-info" style="font-size:13px;color:var(--muted);margin-bottom:16px;font-family:'DM Mono',monospace;"></div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">BESTELLT → VERBRAUCHT</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase">
+        <div>Produkt</div><div>Preis</div><div>Bestellt</div><div>Verbraucht</div><div>Gesamt</div>
+      </div>
+      <div id="billing-items"></div>
+      <div class="summary-box"><div class="summary-row"><span>Gesamtbetrag:</span><span id="billing-total" class="text-accent" style="font-weight:800">0,00 €</span></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('billing-modal')">Abbrechen</button><button class="btn btn-primary" onclick="completeBilling()">Abrechnung abschließen</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="user-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Benutzer hinzufügen</div><button class="btn-icon" onclick="closeModal('user-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Benutzername</label><input type="text" id="user-name" placeholder="Name" /></div>
+      <div class="form-group"><label>PIN</label><input type="password" id="user-pin" placeholder="••••" maxlength="6" /></div>
+      <div class="form-group"><label>Rolle</label><select id="user-role"><option value="user">Benutzer</option><option value="admin">Admin</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('user-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveUser()">Speichern</button></div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://esqztdytskljgksvxesu.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzcXp0ZHl0c2tsamdrc3Z4ZXN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODI0NjksImV4cCI6MjA5MjM1ODQ2OX0.6M-9KuAnJKCYZ4QbaibtP5BfLlDiz4nA81I3negWevk';
+
+async function sb(path,options={}){
+  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':options.prefer||'',...(options.headers||{})},
+    method:options.method||'GET',
+    body:options.body?JSON.stringify(options.body):undefined
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  const t=await res.text();return t?JSON.parse(t):null;
+}
+
+let state={users:[],rooms:[],costcenters:[],categories:[],products:[],bookings:[],settings:{timeout:30},favorites:[],quickSelect:[]};
+let currentUser=null,sessionTimer=null,sessionEnd=null,editingBookingId=null,editingProductId=null,billingBookingId=null,currentProductFilter='',currentBkFilter='';
+
+let syncTo=null;
+function showSync(s,m){const e=document.getElementById('sync-indicator');e.className=s;e.textContent=m;clearTimeout(syncTo);if(s==='saved')syncTo=setTimeout(()=>{e.className='';},2000);}
+
+async function loadAll(){
+  try{
+    console.log('loadAll: START');
+    const[users,rooms,cc,cats,prods,bks,sett]=await Promise.all([
+      sb('users?select=*&order=id'),sb('rooms?select=*&order=id'),sb('costcenters?select=*&order=id'),
+      sb('categories?select=*&order=id'),sb('products?select=*&order=id'),
+      sb('bookings?select=*&order=id'),sb('settings?select=*&id=eq.1')
+    ]);
+    console.log('loadAll: users=',users,'rooms=',rooms);
+    state.users=(users||[]);
+    state.rooms=(rooms||[]).map(r=>r.name);
+    state.costcenters=(cc||[]).map(c=>c.name);
+    state.categories=(cats||[]).map(c=>c.name);
+    state.products=(prods||[]).map(p=>({id:p.id,plu:p.plu,name:p.name,category:p.category,unit:p.unit,price:parseFloat(p.price),inactive:p.inactive}));
+    state.bookings=(bks||[]).map(b=>({id:b.id,room:b.room,costcenter:b.costcenter,date:b.date,from:b.time_from?.slice(0,5),to:b.time_to?.slice(0,5),note:b.note,status:b.status,products:b.products||[],billingData:b.billing_data||{},billedTotal:parseFloat(b.billed_total)||0,billedAt:b.billed_at,createdAt:b.created_at}));
+    if(sett?.[0]){const s=sett[0];state.settings={timeout:s.timeout||30};state.favorites=s.favorites||[];state.quickSelect=s.quick_select||[];}
+    console.log('loadAll: DONE - users count:',state.users.length);
+  }catch(e){console.error('loadAll ERROR:',e);throw e;}
+}
+
+async function saveGlobalSettings(){
+  showSync('saving','Speichern...');
+  try{await sb('settings?id=eq.1',{method:'PATCH',prefer:'',body:{timeout:state.settings.timeout,favorites:state.favorites,quick_select:state.quickSelect}});showSync('saved','Gespeichert');}
+  catch(e){showSync('error','Fehler');}
+}
+
+function doLogin(){
+  const u=document.getElementById('login-user').value.trim();
+  const p=document.getElementById('login-pin').value.trim();
+  const found=state.users.find(x=>x.name.toLowerCase()===u.toLowerCase()&&x.pin===p);
+  if(!found){document.getElementById('login-error').style.display='block';return;}
+  document.getElementById('login-error').style.display='none';
+  currentUser=found;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('sidebar-username').textContent=found.name+' ('+found.role+')';
+  startSession();refreshAll();
+}
+function doLogout(){currentUser=null;clearInterval(sessionTimer);document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pin').value='';}
+document.getElementById('login-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+function startSession(){clearInterval(sessionTimer);const m=parseInt(document.getElementById('setting-timeout').value)||30;sessionEnd=Date.now()+m*60000;sessionTimer=setInterval(tickSession,1000);document.getElementById('session-warning').style.display='none';}
+function resetSession(){if(currentUser)startSession();}
+function tickSession(){
+  const r=sessionEnd-Date.now();if(r<=0){clearInterval(sessionTimer);doLogout();return;}
+  const total=(parseInt(document.getElementById('setting-timeout').value)||30)*60000;
+  document.getElementById('session-progress').style.width=(r/total*100)+'%';
+  const s=Math.floor(r/1000),mm=Math.floor(s/60).toString().padStart(2,'0'),ss=(s%60).toString().padStart(2,'0');
+  document.getElementById('session-timer-display').textContent=mm+':'+ss;
+  const m=document.getElementById('mobile-session-display');if(m)m.textContent=mm+':'+ss;
+  if(r<=60000){document.getElementById('session-warning').style.display='block';document.getElementById('warn-secs').textContent=s;}
+  else document.getElementById('session-warning').style.display='none';
+}
+document.addEventListener('mousemove',resetSession);document.addEventListener('keydown',resetSession);document.addEventListener('click',resetSession);
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  const sn=document.querySelector('[data-view="'+name+'"]');if(sn)sn.classList.add('active');
+  const mn=document.querySelector('[data-mobview="'+name+'"]');if(mn)mn.classList.add('active');
+  if(name==='settings'){const mt=document.querySelector('[data-mobview="stammdaten"]');if(mt)mt.classList.add('active');}
+  if(name==='overview')renderOverview();if(name==='bookings')renderBookings();if(name==='billing')renderBillingList();
+  if(name==='products')renderProducts();if(name==='stammdaten')renderStammdaten();if(name==='settings')renderSettings();
+  window.scrollTo(0,0);
+}
+
+function renderOverview(){
+  const today=new Date().toISOString().slice(0,10);
+  const tb=state.bookings.filter(b=>b.date===today);
+  const ac=state.bookings.filter(b=>b.status==='active');
+  const pe=state.bookings.filter(b=>b.status==='done');
+  const mo=new Date().toISOString().slice(0,7);
+  const rev=state.bookings.filter(b=>b.status==='billed'&&b.date?.startsWith(mo)).reduce((s,b)=>s+(b.billedTotal||0),0);
+  document.getElementById('stat-today').textContent=tb.length;document.getElementById('stat-active').textContent=ac.length;
+  document.getElementById('stat-pending').textContent=pe.length;document.getElementById('stat-revenue').textContent=rev.toFixed(2)+' €';
+  const tbody=document.getElementById('today-tbody');
+  tbody.innerHTML=tb.length?tb.map(b=>bookingRow(b,true)).join(''):'<tr><td colspan="6" class="empty">Keine Buchungen heute.</td></tr>';
+}
+
+function renderBookings(){
+  populateFilter('filter-room',state.rooms);populateFilter('filter-ks',state.costcenters);
+  const df=document.getElementById('filter-date').value,rf=document.getElementById('filter-room').value,kf=document.getElementById('filter-ks').value,sf=document.getElementById('filter-status').value;
+  let bk=[...state.bookings].reverse();
+  if(df)bk=bk.filter(b=>b.date===df);if(rf)bk=bk.filter(b=>b.room===rf);if(kf)bk=bk.filter(b=>b.costcenter===kf);if(sf)bk=bk.filter(b=>b.status===sf);
+  const tbody=document.getElementById('bookings-tbody');
+  tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,false)).join(''):'<tr><td colspan="9" class="empty">Keine Buchungen gefunden.</td></tr>';
+}
+
+function bookingRow(b,compact){
+  const sm={pending:'badge-pending',active:'badge-active',done:'badge-done',billed:'badge-billed'};
+  const sl={pending:'Ausstehend',active:'Aktiv',done:'Abgeschl.',billed:'Abgerechnet'};
+  const cnt=b.products?b.products.reduce((s,p)=>s+p.qty,0):0;
+  const ia=currentUser?.role==='admin',lk=b.status==='billed'&&!ia;
+  const ac=lk?`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</div>`
+    :`<div class="flex gap-2"><button class="btn btn-secondary btn-sm" onclick="openBookingModal(${b.id})">✎</button>${b.status!=='billed'?`<button class="btn btn-secondary btn-sm" onclick="setStatus(${b.id},'${nextStatus(b.status)}')">${nextStatusLabel(b.status)}</button>`:''}${ia&&b.status==='billed'?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">€ Ansehen</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteBooking(${b.id})">✕</button></div>`;
+  if(compact)return`<tr><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date} ${b.from}–${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${ac}</td></tr>`;
+  return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.from}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td style="position:sticky;right:0;background:var(--surface)">${ac}</td></tr>`;
+}
+
+function nextStatus(s){return s==='pending'?'active':s==='active'?'done':s==='done'?'billed':'billed';}
+function nextStatusLabel(s){return s==='pending'?'▶ Starten':s==='active'?'■ Beenden':s==='done'?'€ Abrechnen':'';}
+
+async function setStatus(id,status){
+  if(status==='billed'){openBillingModal(id);return;}
+  const b=state.bookings.find(x=>x.id===id);if(!b)return;
+  b.status=status;showSync('saving','Speichern...');
+  try{await sb('bookings?id=eq.'+id,{method:'PATCH',prefer:'',body:{status}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  refreshAll();
+}
+
+async function deleteBooking(id){
+  const b=state.bookings.find(x=>x.id===id);const ia=currentUser?.role==='admin';
+  if(b?.status==='billed'&&!ia){alert('Abgerechnete Buchungen können nur von Admins gelöscht werden.');return;}
+  if(!confirm('Buchung löschen?'))return;
+  showSync('saving','Speichern...');
+  try{await sb('bookings?id=eq.'+id,{method:'DELETE'});state.bookings=state.bookings.filter(x=>x.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}
+  refreshAll();
+}
+
+function openBookingModal(id){
+  editingBookingId=id||null;
+  if(id){const b=state.bookings.find(x=>x.id===id);if(b?.status==='billed'&&currentUser?.role!=='admin'){alert('Nur Admins können abgerechnete Buchungen bearbeiten.');return;}}
+  document.getElementById('booking-modal-title').textContent=id?'Buchung bearbeiten':'Neue Buchung';
+  populateSelect('bk-room',state.rooms);populateSelect('bk-ks',state.costcenters);
+  window._bkProducts={};
+  if(id){const b=state.bookings.find(x=>x.id===id);document.getElementById('bk-room').value=b.room;document.getElementById('bk-ks').value=b.costcenter;document.getElementById('bk-date').value=b.date;document.getElementById('bk-from').value=b.from;document.getElementById('bk-to').value=b.to;document.getElementById('bk-note').value=b.note||'';if(b.products)b.products.forEach(p=>{window._bkProducts[p.id]=p.qty;});}
+  else{document.getElementById('bk-date').value=new Date().toISOString().slice(0,10);document.getElementById('bk-from').value='';document.getElementById('bk-to').value='';document.getElementById('bk-note').value='';}
+  renderBkCatTabs();renderBkQuickSelect();const s=document.getElementById('bk-search');if(s)s.value='';
+  document.getElementById('booking-modal').classList.add('open');
+}
+
+function renderBkCatTabs(){
+  const hf=state.favorites?.length>0;const ac=['Alle',...(hf?['★ Favoriten']:[]),...state.categories];
+  document.getElementById('bk-cat-tabs').innerHTML=ac.map(c=>`<div class="cat-tab ${currentBkFilter===c||(c==='Alle'&&!currentBkFilter)?'active':''}" onclick="setBkFilter('${c}')">${c}</div>`).join('');
+  renderBkProducts();
+}
+function setBkFilter(cat){currentBkFilter=cat==='Alle'?'':cat;renderBkCatTabs();}
+
+function renderBkProducts(){
+  const list=document.getElementById('bk-product-list');
+  const search=(document.getElementById('bk-search')?.value||'').toLowerCase().trim();
+  const favs=state.favorites||[];
+  let prods=state.products.filter(p=>!p.inactive);
+  if(currentBkFilter==='★ Favoriten')prods=prods.filter(p=>favs.includes(p.id));
+  else if(currentBkFilter)prods=prods.filter(p=>p.category===currentBkFilter);
+  if(search)prods=prods.filter(p=>p.name.toLowerCase().includes(search));
+  if(currentBkFilter!=='★ Favoriten')prods.sort((a,b)=>(favs.includes(a.id)?0:1)-(favs.includes(b.id)?0:1));
+  if(!prods.length){list.innerHTML='<div class="empty">Keine Produkte gefunden.</div>';return;}
+  list.innerHTML=prods.map(p=>{const qty=window._bkProducts[p.id]||0;const iF=favs.includes(p.id);
+    return`<div class="product-item"><div class="product-item-info"><div class="product-item-name"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px 0 0;color:${iF?'#ffb347':'var(--border)'}">${iF?'★':'☆'}</button>${p.name}</div><div class="product-item-cat">${p.category} · ${p.price.toFixed(2)} € / ${p.unit}</div></div><div class="product-qty"><button class="qty-btn" onclick="changeBkQty(${p.id},-1)">−</button><div class="qty-display" id="bkqty-${p.id}">${qty}</div><button class="qty-btn" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;
+  }).join('');
+}
+
+async function toggleFavorite(id){
+  if(!state.favorites)state.favorites=[];const i=state.favorites.indexOf(id);
+  if(i>=0)state.favorites.splice(i,1);else state.favorites.push(id);
+  await saveGlobalSettings();
+  const inM=document.getElementById('booking-modal').classList.contains('open');
+  if(inM)renderBkCatTabs();else renderProducts();
+}
+
+function changeBkQty(pid,delta){
+  const cur=window._bkProducts[pid]||0,next=Math.max(0,cur+delta);window._bkProducts[pid]=next;
+  const e=document.getElementById('bkqty-'+pid);if(e)e.textContent=next;
+  const q=document.getElementById('qqty-'+pid);if(q)q.textContent=next;
+  renderBkQuickSelect();
+}
+
+async function saveBooking(){
+  const room=document.getElementById('bk-room').value,ks=document.getElementById('bk-ks').value,date=document.getElementById('bk-date').value,from=document.getElementById('bk-from').value,to=document.getElementById('bk-to').value,note=document.getElementById('bk-note').value;
+  if(!room||!ks||!date||!from||!to){alert('Bitte alle Pflichtfelder ausfüllen.');return;}
+  const products=Object.entries(window._bkProducts).filter(([,q])=>q>0).map(([id,qty])=>({id:parseInt(id),qty}));
+  showSync('saving','Speichern...');
+  try{
+    if(editingBookingId){
+      await sb('bookings?id=eq.'+editingBookingId,{method:'PATCH',prefer:'',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,products}});
+      const b=state.bookings.find(x=>x.id===editingBookingId);Object.assign(b,{room,costcenter:ks,date,from,to,note,products});
+    }else{
+      const r=await sb('bookings',{method:'POST',prefer:'return=representation',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,products,status:'pending'}});
+      if(r?.[0]){const b=r[0];state.bookings.push({id:b.id,room,costcenter:ks,date,from,to,note,products,status:'pending',createdAt:b.created_at});}
+    }
+    showSync('saved','Gespeichert');
+  }catch(e){showSync('error','Fehler');console.error(e);}
+  closeModal('booking-modal');refreshAll();
+}
+
+function renderBillingList(){
+  const sf=document.getElementById('billing-filter-status').value,mf=document.getElementById('billing-filter-month').value;
+  let bk=[...state.bookings].reverse();if(sf)bk=bk.filter(b=>b.status===sf);if(mf)bk=bk.filter(b=>b.date?.startsWith(mf));
+  const tbody=document.getElementById('billing-tbody');
+  if(!bk.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Keine Einträge.</td></tr>';return;}
+  const ia=currentUser?.role==='admin';
+  tbody.innerHTML=bk.map(b=>{
+    const tot=b.products?b.products.reduce((s,p)=>{const pr=state.products.find(x=>x.id===p.id);return s+(pr?pr.price*p.qty:0);},0):0;
+    const sm={pending:'badge-pending',active:'badge-active',done:'badge-done',billed:'badge-billed'};
+    const sl={pending:'Ausstehend',active:'Aktiv',done:'Abzurechnen',billed:'Abgerechnet'};
+    const bi=b.status==='billed'?`<span class="text-green">${(b.billedTotal||0).toFixed(2)} €</span>`:`${tot.toFixed(2)} €`;
+    return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace">${bi}</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${b.status==='done'?`<button class="btn btn-primary btn-sm" onclick="openBillingModal(${b.id})">Abrechnen</button>`:''}${b.status==='billed'&&ia?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">Ansehen</button>`:''}${b.status==='billed'&&!ia?`<span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</span>`:''}</td></tr>`;
+  }).join('');
+}
+
+function openBillingModal(id){
+  billingBookingId=id;const b=state.bookings.find(x=>x.id===id);const ia=currentUser?.role==='admin';const ro=b.status==='billed'&&!ia;
+  document.getElementById('billing-info').textContent=`#${b.id} · ${b.room} · ${b.date} ${b.from}–${b.to} · KST: ${b.costcenter}`;
+  const btn=document.querySelector('#billing-modal .modal-footer .btn-primary');if(btn)btn.style.display=ro?'none':'';
+  const items=document.getElementById('billing-items');
+  if(!b.products?.length){items.innerHTML='<div class="empty">Keine Produkte.</div>';document.getElementById('billing-total').textContent='0,00 €';document.getElementById('billing-modal').classList.add('open');return;}
+  items.innerHTML=b.products.map(p=>{const prod=state.products.find(x=>x.id===p.id);if(!prod)return'';const c=b.billingData?(b.billingData[p.id]??p.qty):p.qty;
+    return`<div class="billing-item"><div><div style="font-size:13px;font-weight:600">${prod.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${prod.unit} · ${prod.price.toFixed(2)} €</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${prod.price.toFixed(2)} €</div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${c}" style="width:70px" id="bill-consumed-${p.id}" ${ro?'disabled':''} onchange="updateBillingTotal()" onkeyup="updateBillingTotal()" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="bill-line-${p.id}">${(prod.price*c).toFixed(2)} €</div></div>`;
+  }).join('');
+  updateBillingTotal();document.getElementById('billing-modal').classList.add('open');
+}
+
+function updateBillingTotal(){
+  const b=state.bookings.find(x=>x.id===billingBookingId);if(!b?.products)return;let tot=0;
+  b.products.forEach(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return;const inp=document.getElementById('bill-consumed-'+p.id);if(!inp)return;const v=Math.min(p.qty,Math.max(0,parseInt(inp.value)||0));const l=v*pr.price;tot+=l;const el=document.getElementById('bill-line-'+p.id);if(el)el.textContent=l.toFixed(2)+' €';});
+  document.getElementById('billing-total').textContent=tot.toFixed(2).replace('.',',')+' €';
+}
+
+async function completeBilling(){
+  const b=state.bookings.find(x=>x.id===billingBookingId);if(!b)return;
+  const bd={};let tot=0;
+  if(b.products)b.products.forEach(p=>{const inp=document.getElementById('bill-consumed-'+p.id);const v=inp?Math.min(p.qty,Math.max(0,parseInt(inp.value)||0)):p.qty;bd[p.id]=v;const pr=state.products.find(x=>x.id===p.id);if(pr)tot+=v*pr.price;});
+  b.billingData=bd;b.billedTotal=tot;b.status='billed';b.billedAt=new Date().toISOString();
+  showSync('saving','Speichern...');
+  try{await sb('bookings?id=eq.'+billingBookingId,{method:'PATCH',prefer:'',body:{status:'billed',billing_data:bd,billed_total:tot,billed_at:b.billedAt}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  closeModal('billing-modal');refreshAll();
+}
+
+function renderProducts(){
+  document.getElementById('product-cat-tabs').innerHTML=['Alle',...state.categories].map(c=>`<div class="cat-tab ${currentProductFilter===c||(c==='Alle'&&!currentProductFilter)?'active':''}" onclick="setProdFilter('${c}')">${c}</div>`).join('');
+  let prods=state.products;if(currentProductFilter)prods=prods.filter(p=>p.category===currentProductFilter);
+  const s=(document.getElementById('prod-search')?.value||'').toLowerCase().trim();if(s)prods=prods.filter(p=>p.name.toLowerCase().includes(s)||(p.plu||'').toLowerCase().includes(s));
+  const tbody=document.getElementById('products-tbody');
+  if(!prods.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Keine Produkte.</td></tr>';return;}
+  tbody.innerHTML=prods.map(p=>{const iF=(state.favorites||[]).includes(p.id);
+    return`<tr id="prod-row-${p.id}" style="${p.inactive?'opacity:0.45':''}"><td style="font-family:'DM Mono',monospace;font-size:12px">${p.plu||'—'}</td><td>${p.name}${p.inactive?' <span class="badge badge-done" style="font-size:10px">inaktiv</span>':''}</td><td><span class="badge badge-pending">${p.category}</span></td><td style="font-family:'DM Mono',monospace;font-size:12px">${p.unit}</td><td style="font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</td><td style="position:sticky;right:0;background:var(--surface);"><div class="flex gap-2" id="prod-actions-${p.id}"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;color:${iF?'#ffb347':'var(--muted)'}">${iF?'★':'☆'}</button><button class="btn btn-secondary btn-sm" onclick="openProductModal(${p.id})">✎</button>${p.inactive?`<button class="btn btn-secondary btn-sm" onclick="reactivateProduct(${p.id})">Aktivieren</button>`:`<button class="btn btn-danger btn-sm" onclick="confirmDeleteProduct(${p.id})">✕</button>`}</div><div class="flex gap-2" id="prod-confirm-${p.id}" style="display:none"><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--danger);align-self:center">Sicher?</span><button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Ja</button><button class="btn btn-secondary btn-sm" onclick="cancelDeleteProduct(${p.id})">Nein</button></div></td></tr>`;
+  }).join('');
+}
+
+function setProdFilter(cat){currentProductFilter=cat==='Alle'?'':cat;renderProducts();}
+
+function openProductModal(id){
+  editingProductId=id||null;
+  document.getElementById('product-modal-title').textContent=id?'Produkt bearbeiten':'Neues Produkt';
+  populateSelect('prod-cat',state.categories);
+  if(id){const p=state.products.find(x=>x.id===id);document.getElementById('prod-name').value=p.name;document.getElementById('prod-plu').value=p.plu||'';document.getElementById('prod-cat').value=p.category;document.getElementById('prod-unit').value=p.unit;document.getElementById('prod-price').value=p.price;}
+  else{document.getElementById('prod-name').value='';document.getElementById('prod-plu').value='';document.getElementById('prod-unit').value='';document.getElementById('prod-price').value='';}
+  document.getElementById('product-modal').classList.add('open');
+}
+
+async function saveProduct(){
+  const name=document.getElementById('prod-name').value.trim(),plu=document.getElementById('prod-plu').value.trim(),cat=document.getElementById('prod-cat').value,unit=document.getElementById('prod-unit').value.trim(),price=parseFloat(document.getElementById('prod-price').value)||0;
+  if(!name||!unit){alert('Name und Einheit sind Pflichtfelder.');return;}if(!plu){alert('PLU ist ein Pflichtfeld.');return;}
+  const dup=state.products.find(x=>x.plu===plu&&x.id!==editingProductId);if(dup){alert(`PLU "${plu}" wird bereits von "${dup.name}" verwendet.`);return;}
+  showSync('saving','Speichern...');
+  try{
+    if(editingProductId){await sb('products?id=eq.'+editingProductId,{method:'PATCH',prefer:'',body:{name,plu,category:cat,unit,price}});const p=state.products.find(x=>x.id===editingProductId);Object.assign(p,{name,plu,category:cat,unit,price});}
+    else{const r=await sb('products',{method:'POST',prefer:'return=representation',body:{name,plu,category:cat,unit,price,inactive:false}});if(r?.[0])state.products.push({id:r[0].id,plu,name,category:cat,unit,price,inactive:false});}
+    showSync('saved','Gespeichert');
+  }catch(e){showSync('error','Fehler');console.error(e);}
+  closeModal('product-modal');renderProducts();
+}
+
+async function reactivateProduct(id){
+  showSync('saving','Speichern...');
+  try{await sb('products?id=eq.'+id,{method:'PATCH',prefer:'',body:{inactive:false}});const p=state.products.find(x=>x.id===id);if(p)p.inactive=false;showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  renderProducts();
+}
+function confirmDeleteProduct(id){document.getElementById('prod-actions-'+id).style.display='none';document.getElementById('prod-confirm-'+id).style.display='flex';}
+function cancelDeleteProduct(id){document.getElementById('prod-actions-'+id).style.display='flex';document.getElementById('prod-confirm-'+id).style.display='none';}
+
+async function deleteProduct(id){
+  const used=state.bookings.some(b=>b.products?.some(p=>p.id===id));
+  if(used){showSync('saving','Speichern...');try{await sb('products?id=eq.'+id,{method:'PATCH',prefer:'',body:{inactive:true}});const p=state.products.find(x=>x.id===id);if(p)p.inactive=true;showSync('saved','Deaktiviert');}catch(e){showSync('error','Fehler');}cancelDeleteProduct(id);renderProducts();return;}
+  showSync('saving','Speichern...');try{await sb('products?id=eq.'+id,{method:'DELETE'});state.products=state.products.filter(x=>x.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderProducts();
+}
+
+function renderStammdaten(){
+  const n=document.getElementById('mobile-mehr-nav');if(n)n.style.display=window.innerWidth<=600?'flex':'none';
+  renderChips('room-chips',state.rooms,'room');renderChips('ks-chips',state.costcenters,'ks');renderChips('cat-chips',state.categories,'cat');
+}
+function renderChips(cid,items,type){document.getElementById(cid).innerHTML=items.map((item,i)=>`<div class="chip">${item}<button class="chip-del" onclick="deleteChip('${type}',${i})">×</button></div>`).join('');}
+
+async function addRoom(){const v=document.getElementById('new-room').value.trim();if(!v||state.rooms.includes(v))return;state.rooms.push(v);document.getElementById('new-room').value='';showSync('saving','Speichern...');try{await sb('rooms',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
+async function addKostenstelle(){const v=document.getElementById('new-ks').value.trim();if(!v||state.costcenters.includes(v))return;state.costcenters.push(v);document.getElementById('new-ks').value='';showSync('saving','Speichern...');try{await sb('costcenters',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
+async function addCategory(){const v=document.getElementById('new-cat').value.trim();if(!v||state.categories.includes(v))return;state.categories.push(v);document.getElementById('new-cat').value='';showSync('saving','Speichern...');try{await sb('categories',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
+async function deleteChip(type,idx){
+  showSync('saving','Speichern...');
+  try{
+    if(type==='room'){const n=state.rooms[idx];state.rooms.splice(idx,1);await sb('rooms?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
+    if(type==='ks'){const n=state.costcenters[idx];state.costcenters.splice(idx,1);await sb('costcenters?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
+    if(type==='cat'){const n=state.categories[idx];state.categories.splice(idx,1);await sb('categories?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
+    showSync('saved','Gespeichert');
+  }catch(e){showSync('error','Fehler');}
+  renderStammdaten();
+}
+
+function renderSettings(){
+  const n=document.getElementById('mobile-mehr-nav-settings');if(n)n.style.display=window.innerWidth<=600?'flex':'none';
+  document.getElementById('setting-timeout').value=state.settings.timeout||30;
+  renderQuickSelectSettings();
+  document.getElementById('users-tbody').innerHTML=state.users.map(u=>`<tr><td>${u.name}</td><td><span class="badge ${u.role==='admin'?'badge-active':'badge-pending'}">${u.role}</span></td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">✕</button>`:'—'}</td></tr>`).join('');
+  const ms=document.getElementById('admin-migration-section');if(ms)ms.style.display=currentUser?.role==='admin'?'block':'none';
+}
+
+// ========== MIGRATION: LocalStorage → Supabase ==========
+function exportLocalStorage(){
+  // Liest alle bekannten LS-Keys der alten Version aus
+  const keys=['ks_bookings','ks_products','ks_rooms','ks_costcenters','ks_categories','ks_users','ks_settings','ks_favorites','ks_quickselect'];
+  const dump={};
+  keys.forEach(k=>{const v=localStorage.getItem(k);if(v)try{dump[k]=JSON.parse(v);}catch(e){dump[k]=v;}});
+  if(!Object.keys(dump).length){alert('Keine lokalen Daten gefunden. Möglicherweise ist dieser Browser nicht die ursprüngliche Instanz.');return;}
+  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ks_localstorage_export_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  log('Export erstellt. Jetzt Schritt 2: JSON importieren.','info');
+}
+
+function log(msg,type='info'){
+  const box=document.getElementById('migration-log');if(!box)return;
+  box.style.display='block';
+  const colors={info:'var(--muted)',ok:'var(--green)',warn:'var(--orange)',err:'var(--danger)'};
+  box.innerHTML+=`<div style="color:${colors[type]||colors.info}">${new Date().toLocaleTimeString('de')} — ${msg}</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+
+async function importToSupabase(event){
+  const file=event.target.files[0];if(!file)return;
+  const box=document.getElementById('migration-log');if(box){box.innerHTML='';box.style.display='block';}
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    let dump;
+    try{dump=JSON.parse(e.target.result);}catch(ex){log('Ungültige JSON-Datei.','err');return;}
+    log('Datei geladen. Starte Migration...','info');
+
+    // ROOMS
+    const rooms=dump['ks_rooms'];
+    if(Array.isArray(rooms)&&rooms.length){
+      for(const name of rooms){try{await sb('rooms',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name}});log(`Raum: ${name}`,'ok');}catch(ex){log(`Raum Fehler: ${name}`,'warn');}}
+    }else log('Keine Räume gefunden.','warn');
+
+    // KOSTENSTELLEN
+    const cc=dump['ks_costcenters'];
+    if(Array.isArray(cc)&&cc.length){
+      for(const name of cc){try{await sb('costcenters',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name}});log(`Kostenstelle: ${name}`,'ok');}catch(ex){log(`KST Fehler: ${name}`,'warn');}}
+    }else log('Keine Kostenstellen gefunden.','warn');
+
+    // KATEGORIEN
+    const cats=dump['ks_categories'];
+    if(Array.isArray(cats)&&cats.length){
+      for(const name of cats){try{await sb('categories',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name}});log(`Kategorie: ${name}`,'ok');}catch(ex){log(`Kat. Fehler: ${name}`,'warn');}}
+    }else log('Keine Kategorien gefunden.','warn');
+
+    // PRODUKTE
+    const prods=dump['ks_products'];
+    if(Array.isArray(prods)&&prods.length){
+      for(const p of prods){
+        try{
+          const body={plu:p.plu||String(p.id),name:p.name,category:p.category||'Sonstiges',unit:p.unit||'Stück',price:parseFloat(p.price)||0,inactive:!!p.inactive};
+          await sb('products',{method:'POST',prefer:'resolution=ignore-duplicates',body});
+          log(`Produkt: ${p.name}`,'ok');
+        }catch(ex){log(`Produkt Fehler: ${p.name}`,'warn');}
+      }
+    }else log('Keine Produkte gefunden.','warn');
+
+    // BUCHUNGEN
+    const bks=dump['ks_bookings'];
+    if(Array.isArray(bks)&&bks.length){
+      // Produkt-ID-Mapping: alte lokale IDs → neue Supabase-IDs per PLU
+      const freshProds=await sb('products?select=*');
+      const pluMap={};// old_id → new_id via plu
+      if(Array.isArray(prods))prods.forEach(op=>{const np=freshProds?.find(fp=>fp.plu===(op.plu||String(op.id)));if(np)pluMap[op.id]=np.id;});
+
+      for(const b of bks){
+        try{
+          const mappedProds=(b.products||[]).map(p=>({id:pluMap[p.id]||p.id,qty:p.qty}));
+          const body={room:b.room,costcenter:b.costcenter||b.ks,date:b.date,time_from:b.from||b.time_from,time_to:b.to||b.time_to,note:b.note||'',status:b.status||'pending',products:mappedProds,billing_data:b.billingData||b.billing_data||{},billed_total:parseFloat(b.billedTotal||b.billed_total)||0,billed_at:b.billedAt||b.billed_at||null};
+          await sb('bookings',{method:'POST',prefer:'resolution=ignore-duplicates',body});
+          log(`Buchung: #${b.id} ${b.room} ${b.date}`,'ok');
+        }catch(ex){log(`Buchung Fehler: #${b.id} — ${ex.message}`,'warn');}
+      }
+    }else log('Keine Buchungen gefunden.','warn');
+
+    // BENUTZER
+    const users=dump['ks_users'];
+    if(Array.isArray(users)&&users.length){
+      for(const u of users){
+        if(!u.name||!u.pin)continue;
+        try{await sb('users',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:u.name,pin:u.pin,role:u.role||'user'}});log(`Benutzer: ${u.name}`,'ok');}catch(ex){log(`Benutzer Fehler: ${u.name}`,'warn');}
+      }
+    }
+
+    log('Migration abgeschlossen. Seite neu laden zum Aktualisieren.','ok');
+    event.target.value='';
+    // Daten neu laden
+    await loadAll();refreshAll();
+  };
+  reader.readAsText(file,'UTF-8');
+}
+async function saveSettingsToDB(){state.settings.timeout=parseInt(document.getElementById('setting-timeout').value)||30;await saveGlobalSettings();}
+
+function openUserModal(){document.getElementById('user-name').value='';document.getElementById('user-pin').value='';document.getElementById('user-role').value='user';document.getElementById('user-modal').classList.add('open');}
+async function saveUser(){
+  const name=document.getElementById('user-name').value.trim(),pin=document.getElementById('user-pin').value.trim(),role=document.getElementById('user-role').value;
+  if(!name||!pin){alert('Name und PIN erforderlich.');return;}if(state.users.find(u=>u.name.toLowerCase()===name.toLowerCase())){alert('Benutzername bereits vergeben.');return;}
+  showSync('saving','Speichern...');try{const r=await sb('users',{method:'POST',prefer:'return=representation',body:{name,pin,role}});if(r?.[0])state.users.push(r[0]);showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  closeModal('user-modal');renderSettings();
+}
+async function deleteUser(id){
+  if(currentUser?.id===id){alert('Eigenen Account nicht löschbar.');return;}if(!confirm('Benutzer löschen?'))return;
+  showSync('saving','Speichern...');try{await sb('users?id=eq.'+id,{method:'DELETE'});state.users=state.users.filter(u=>u.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderSettings();
+}
+
+function renderQuickSelectSettings(){
+  const sel=document.getElementById('qs-prod-select');if(!sel)return;
+  const qs=state.quickSelect||[];const av=state.products.filter(p=>!p.inactive&&!qs.includes(p.id));
+  sel.innerHTML=av.length?av.map(p=>`<option value="${p.id}">${p.name} (${p.plu||'—'})</option>`).join(''):'<option value="">Alle hinzugefügt</option>';
+  const list=document.getElementById('qs-list');
+  if(!qs.length){list.innerHTML='<div style="font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;">Noch keine Produkte hinzugefügt.</div>';return;}
+  list.innerHTML=qs.map((id,i)=>{const p=state.products.find(x=>x.id===id);if(!p)return'';
+    return`<div class="qs-item" draggable="true" data-id="${id}" data-idx="${i}" ondragstart="qsDragStart(event)" ondragover="qsDragOver(event)" ondrop="qsDrop(event)" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);cursor:grab;"><span style="color:var(--muted);font-size:16px;">⠿</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${p.plu||'—'} · ${p.price.toFixed(2)} € / ${p.unit}</div></div><button class="btn btn-danger btn-sm" onclick="removeQuickSelect(${id})">✕</button></div>`;
+  }).join('');
+}
+async function addQuickSelect(){const id=parseInt(document.getElementById('qs-prod-select').value);if(!id)return;if(!state.quickSelect)state.quickSelect=[];if(!state.quickSelect.includes(id))state.quickSelect.push(id);await saveGlobalSettings();renderQuickSelectSettings();}
+async function removeQuickSelect(id){state.quickSelect=(state.quickSelect||[]).filter(x=>x!==id);await saveGlobalSettings();renderQuickSelectSettings();}
+let qsDragIdx=null;
+function qsDragStart(e){qsDragIdx=parseInt(e.currentTarget.dataset.idx);}
+function qsDragOver(e){e.preventDefault();}
+async function qsDrop(e){e.preventDefault();const t=parseInt(e.currentTarget.dataset.idx);if(qsDragIdx===null||qsDragIdx===t)return;const item=state.quickSelect.splice(qsDragIdx,1)[0];state.quickSelect.splice(t,0,item);await saveGlobalSettings();renderQuickSelectSettings();}
+
+function renderBkQuickSelect(){
+  const c=document.getElementById('bk-quickselect');if(!c)return;
+  const qs=(state.quickSelect||[]).map(id=>state.products.find(p=>p.id===id&&!p.inactive)).filter(Boolean);
+  if(!qs.length){c.innerHTML='';return;}
+  c.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Schnellauswahl</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">${qs.map(p=>{const qty=window._bkProducts[p.id]||0;return`<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface2);border:1px solid ${qty>0?'var(--accent)':'var(--border)'};min-width:120px;"><div style="flex:1"><div style="font-size:12px;font-weight:700">${p.name}</div><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</div></div><div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},-1)">−</button><span style="font-family:'DM Mono',monospace;font-size:13px;min-width:18px;text-align:center" id="qqty-${p.id}">${qty}</span><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;}).join('')}</div><hr style="border:none;border-top:1px solid var(--border);margin:8px 0 0" />`;
+}
+
+async function importProductCSV(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    const text=e.target.result,lines=text.split(/\r?\n/).filter(l=>l.trim());
+    if(!lines.length){showImportResult('Datei ist leer.',false);return;}
+    const sep=lines[0].includes('\t')?'\t':lines[0].includes(';')?';':',';
+    const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));
+    const idx=n=>headers.findIndex(h=>h.toLowerCase()===n.toLowerCase());
+    const iP=idx('PLU'),iN=idx('Kurzbez.'),iC=idx('Produktgruppe'),iPr=idx('Gästepreis');
+    if(iP===-1||iN===-1){showImportResult('Pflichtfelder PLU oder Kurzbez. nicht gefunden.',false);return;}
+    let added=0,updated=0,skipped=0;
+    for(const line of lines.slice(1)){
+      const cols=line.split(sep).map(c=>c.trim().replace(/^"|"$/g,''));
+      const plu=cols[iP]||'',name=cols[iN]||'',cat=iC>=0?(cols[iC]||'Sonstiges'):'Sonstiges',price=iPr>=0?parseFloat((cols[iPr]||'0').replace(',','.'))||0:0;
+      if(!plu||!name){skipped++;continue;}
+      if(!state.categories.includes(cat)){state.categories.push(cat);try{await sb('categories',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:cat}});}catch(e){}}
+      const ex=state.products.find(p=>p.plu===plu);
+      if(ex){try{await sb('products?id=eq.'+ex.id,{method:'PATCH',prefer:'',body:{name,category:cat,price}});Object.assign(ex,{name,category:cat,price});updated++;}catch(e){skipped++;}}
+      else{try{const r=await sb('products',{method:'POST',prefer:'return=representation',body:{plu,name,category:cat,unit:'Stück',price,inactive:false}});if(r?.[0])state.products.push({id:r[0].id,plu,name,category:cat,unit:'Stück',price,inactive:false});added++;}catch(e){skipped++;}}
+    }
+    renderProducts();showImportResult(`Import: ${added} neu, ${updated} aktualisiert${skipped?', '+skipped+' übersprungen':''}.`,true);event.target.value='';
+  };reader.readAsText(file,'UTF-8');
+}
+function showImportResult(msg,ok){const el=document.getElementById('import-result');el.style.display='block';el.style.borderColor=ok?'var(--green)':'var(--danger)';el.style.color=ok?'var(--green)':'var(--danger)';el.textContent=msg;setTimeout(()=>{el.style.display='none';},5000);}
+
+function exportCSV(){
+  const rows=[['ID','Raum','Datum','Von','Bis','Kostenstelle','Status','Bestellt (€)','Abgerechnet (€)','Abgerechnet am']];
+  state.bookings.forEach(b=>{const tot=b.products?b.products.reduce((s,p)=>{const pr=state.products.find(x=>x.id===p.id);return s+(pr?pr.price*p.qty:0);},0):0;rows.push([b.id,b.room,b.date,b.from,b.to,b.costcenter,b.status,tot.toFixed(2),b.billedTotal?b.billedTotal.toFixed(2):'',b.billedAt?b.billedAt.slice(0,10):'']);});
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='konferenzservice_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+function populateSelect(id,items){document.getElementById(id).innerHTML=items.map(i=>`<option value="${i}">${i}</option>`).join('');}
+function populateFilter(id,items){const el=document.getElementById(id);const cur=el.value;el.innerHTML='<option value="">Alle</option>'+items.map(i=>`<option value="${i}">${i}</option>`).join('');el.value=cur;}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function refreshAll(){
+  const a=document.querySelector('.nav-item.active')||document.querySelector('.mob-nav-item.active');if(!a)return;
+  const v=a.dataset.view||a.dataset.mobview;
+  if(v==='overview')renderOverview();if(v==='bookings')renderBookings();if(v==='billing')renderBillingList();if(v==='products')renderProducts();if(v==='stammdaten')renderStammdaten();
+}
+
+function toggleTheme(){const l=document.body.classList.toggle('light');localStorage.setItem('ks_theme',l?'light':'dark');document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent=l?'◑':'◐');}
+
+(async function init(){
+  const t=localStorage.getItem('ks_theme');if(t==='light'){document.body.classList.add('light');document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent='◑');}
+  try{
+    await loadAll();
+    document.getElementById('loading-overlay').classList.add('hidden');
+    document.getElementById('login-screen').style.display='flex';
+  }catch(e){
+    document.querySelector('.loading-text').textContent='Verbindungsfehler — bitte Seite neu laden.';
+    document.querySelector('.spinner').style.display='none';
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
