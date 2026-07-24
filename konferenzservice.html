@@ -673,13 +673,17 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SUPA_URL='https://esqztdytskljgksvxesu.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzcXp0ZHl0c2tsamdrc3Z4ZXN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODI0NjksImV4cCI6MjA5MjM1ODQ2OX0.6M-9KuAnJKCYZ4QbaibtP5BfLlDiz4nA81I3negWevk';
+const supa=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:false,autoRefreshToken:true}});
 
 async function sb(path,options={}){
+  const{data:{session}}=await supa.auth.getSession();
+  const token=session?.access_token||SUPA_KEY;
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':options.prefer||'',...(options.headers||{})},
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':options.prefer||'',...(options.headers||{})},
     method:options.method||'GET',
     body:options.body?JSON.stringify(options.body):undefined
   });
@@ -697,7 +701,7 @@ async function loadAll(){
   try{
     console.log('loadAll: START');
     const[users,rooms,cc,cats,prods,bks,sett,meta,locs]=await Promise.all([
-      sb('users?select=*&order=id'),sb('rooms?select=*&order=id'),sb('costcenters?select=*&order=id'),
+      sb('profiles?select=*&order=name'),sb('rooms?select=*&order=id'),sb('costcenters?select=*&order=id'),
       sb('categories?select=*&order=id'),sb('products?select=*&order=id'),
       sb('bookings?select=*&order=id'),sb('settings?select=*&id=eq.1'),sb('app_meta?select=*&id=eq.1'),
       sb('locations?select=*&order=id')
@@ -740,20 +744,32 @@ async function saveGlobalSettings(){
   catch(e){showSync('error','Fehler');}
 }
 
-function doLogin(){
+async function doLogin(){
   const u=document.getElementById('login-user').value.trim();
   const p=document.getElementById('login-pin').value.trim();
-  const found=state.users.find(x=>x.name.toLowerCase()===u.toLowerCase()&&x.pin===p);
-  if(!found){document.getElementById('login-error').style.display='block';return;}
-  document.getElementById('login-error').style.display='none';
-  currentUser=found;
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='block';
-  const locName=found.role==='admin'?'Alle Standorte':(state.locations.find(l=>l.id===found.location_id)?.name||'Kein Standort');
-  document.getElementById('sidebar-username').textContent=found.name+' ('+found.role+') · '+locName;
-  applyRoleNav();
-  startSession();
-  showView(found.role==='service'?'service':'overview');
+  if(!u||!p){document.getElementById('login-error').style.display='block';return;}
+  const email=u.toLowerCase()+'@konferenzservice.internal';
+  const{data,error}=await supa.auth.signInWithPassword({email,password:p});
+  if(error||!data?.user){document.getElementById('login-error').style.display='block';return;}
+  try{
+    const profRows=await sb('profiles?select=*&id=eq.'+data.user.id);
+    const prof=profRows?.[0];
+    if(!prof){document.getElementById('login-error').style.display='block';await supa.auth.signOut();return;}
+    document.getElementById('login-error').style.display='none';
+    currentUser={id:prof.id,name:prof.name,role:prof.role,location_id:prof.location_id};
+    await loadAll();
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    const locName=currentUser.role==='admin'?'Alle Standorte':(state.locations.find(l=>l.id===currentUser.location_id)?.name||'Kein Standort');
+    document.getElementById('sidebar-username').textContent=currentUser.name+' ('+currentUser.role+') · '+locName;
+    applyRoleNav();
+    startSession();
+    showView(currentUser.role==='service'?'service':'overview');
+  }catch(e){
+    console.error(e);
+    document.getElementById('login-error').style.display='block';
+    await supa.auth.signOut();
+  }
 }
 
 const VIEW_PERMISSIONS={
@@ -771,7 +787,7 @@ function applyRoleNav(){
   });
   const mehrTab=document.getElementById('mob-nav-stammdaten');if(mehrTab)mehrTab.style.display=(role==='service')?'none':'flex';
 }
-function doLogout(){currentUser=null;clearInterval(sessionTimer);document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pin').value='';}
+function doLogout(){currentUser=null;clearInterval(sessionTimer);supa.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pin').value='';}
 document.getElementById('login-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 function startSession(){clearInterval(sessionTimer);const m=parseInt(document.getElementById('setting-timeout').value)||30;sessionEnd=Date.now()+m*60000;sessionTimer=setInterval(tickSession,1000);document.getElementById('session-warning').style.display='none';}
@@ -1287,10 +1303,10 @@ function renderSettings(){
 function renderUsersTable(){
   const t=document.getElementById('users-tbody');if(!t)return;
   t.innerHTML=state.users.map(u=>{
-    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation(${u.id},this.value)" style="width:auto;min-width:150px;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
+    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:auto;min-width:150px;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
     const roleBadgeClass=u.role==='admin'?'badge-active':u.role==='service'?'badge-done':'badge-pending';
     const roleLabel=u.role==='admin'?'admin':u.role==='service'?'service':'user';
-    return`<tr><td>${u.name}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">✕</button>`:'—'}</td></tr>`;
+    return`<tr><td>${u.name}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:'—'}</td></tr>`;
   }).join('');
 }
 
@@ -1416,18 +1432,25 @@ async function saveUser(){
   const locVal=document.getElementById('user-location').value;const location_id=locVal?parseInt(locVal):null;
   if(!name||!pin){alert('Name und PIN erforderlich.');return;}if(state.users.find(u=>u.name.toLowerCase()===name.toLowerCase())){alert('Benutzername bereits vergeben.');return;}
   if((role==='user'||role==='service')&&!location_id&&!confirm('Kein Standort ausgewählt. Dieser Benutzer sieht dann keine Konferenzräume/Buchungen, bis ein Standort zugewiesen wird. Trotzdem speichern?'))return;
-  showSync('saving','Speichern...');try{const r=await sb('users',{method:'POST',prefer:'return=representation',body:{name,pin,role,location_id}});if(r?.[0])state.users.push(r[0]);showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  showSync('saving','Speichern...');
+  try{
+    await sb('rpc/admin_create_user',{method:'POST',body:{p_name:name,p_pin:pin,p_role:role,p_location_id:location_id}});
+    const rows=await sb('profiles?select=*&order=name');state.users=rows||[];
+    showSync('saved','Gespeichert');
+  }catch(e){showSync('error','Fehler');console.error(e);}
   closeModal('user-modal');renderUsersTable();
 }
 async function updateUserLocation(id,val){
   const location_id=val?parseInt(val):null;
   const u=state.users.find(x=>x.id===id);if(u)u.location_id=location_id;
   showSync('saving','Speichern...');
-  try{await sb('users?id=eq.'+id,{method:'PATCH',prefer:'',body:{location_id}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  try{await sb('profiles?id=eq.'+id,{method:'PATCH',prefer:'',body:{location_id}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
 }
 async function deleteUser(id){
   if(currentUser?.id===id){alert('Eigenen Account nicht löschbar.');return;}if(!confirm('Benutzer löschen?'))return;
-  showSync('saving','Speichern...');try{await sb('users?id=eq.'+id,{method:'DELETE'});state.users=state.users.filter(u=>u.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderUsersTable();
+  showSync('saving','Speichern...');
+  try{await sb('rpc/admin_delete_user',{method:'POST',body:{p_user_id:id}});state.users=state.users.filter(u=>u.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');console.error(e);}
+  renderUsersTable();
 }
 
 function renderQuickSelectSettings(){
@@ -1531,7 +1554,11 @@ function toggleTheme(){const l=document.body.classList.toggle('light');localStor
 (async function init(){
   const t=localStorage.getItem('ks_theme');if(t==='light'){document.body.classList.add('light');document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent='◑');}
   try{
-    await loadAll();
+    const meta=await sb('app_meta?select=*&id=eq.1');
+    if(meta?.[0]){
+      const m=meta[0];
+      const lv=document.getElementById('login-version-info');if(lv)lv.innerHTML=`// Dashboard ${m.version}<br>// Stand ${m.build_date}`;
+    }
     document.getElementById('loading-overlay').classList.add('hidden');
     document.getElementById('login-screen').style.display='flex';
   }catch(e){
