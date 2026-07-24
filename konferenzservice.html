@@ -68,6 +68,16 @@
   .page-title{font-size:26px;font-weight:800;letter-spacing:-0.5px;}
   .page-title span{color:var(--accent);}
   .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .cal-weekday{text-align:center;font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding-bottom:6px;}
+  .cal-day{position:relative;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;background:var(--surface);border:1px solid var(--border);cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);transition:all 0.15s;min-height:40px;}
+  .cal-day:hover{border-color:var(--accent);}
+  .cal-day.empty-day{visibility:hidden;cursor:default;}
+  .cal-day.today{border-color:var(--accent2);}
+  .cal-day.selected{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+  .cal-day .cal-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);position:absolute;bottom:5px;}
+  .cal-day.selected .cal-dot{background:var(--bg);}
+  @media(max-width:700px){.cal-grid{gap:4px;}.cal-day{font-size:11px;min-height:32px;}}
   .stat-card{background:var(--surface);border:1px solid var(--border);padding:20px;position:relative;overflow:hidden;}
   .stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
   .stat-card.green::after{background:var(--green);}
@@ -337,6 +347,7 @@
     <nav class="nav">
       <div class="nav-item active" id="nav-overview" onclick="showView('overview')" data-view="overview"><span class="nav-icon">◈</span><span class="nav-label"> Übersicht</span></div>
       <div class="nav-item" id="nav-bookings" onclick="showView('bookings')" data-view="bookings"><span class="nav-icon">◉</span><span class="nav-label"> Buchungen</span></div>
+      <div class="nav-item" id="nav-calendar" onclick="showView('calendar')" data-view="calendar"><span class="nav-icon">▦</span><span class="nav-label"> Kalender</span></div>
       <div class="nav-item" id="nav-billing" onclick="showView('billing')" data-view="billing"><span class="nav-icon">◎</span><span class="nav-label"> Abrechnung</span></div>
       <div class="nav-item" id="nav-products" onclick="showView('products')" data-view="products"><span class="nav-icon">◧</span><span class="nav-label"> Produkte</span></div>
       <div class="nav-item" id="nav-service" style="display:none;" onclick="showView('service')" data-view="service"><span class="nav-icon">▶</span><span class="nav-label"> Service</span></div>
@@ -354,6 +365,7 @@
   <div id="mobile-bottomnav" style="display:none">
     <div class="mob-nav-item active" id="mob-nav-overview" onclick="showView('overview')" data-mobview="overview"><span class="mob-nav-icon">◈</span><span>Übersicht</span></div>
     <div class="mob-nav-item" id="mob-nav-bookings" onclick="showView('bookings')" data-mobview="bookings"><span class="mob-nav-icon">◉</span><span>Buchungen</span></div>
+    <div class="mob-nav-item" id="mob-nav-calendar" onclick="showView('calendar')" data-mobview="calendar"><span class="mob-nav-icon">▦</span><span>Kalender</span></div>
     <div class="mob-nav-item" id="mob-nav-billing" onclick="showView('billing')" data-mobview="billing"><span class="mob-nav-icon">◎</span><span>Abrechnung</span></div>
     <div class="mob-nav-item" id="mob-nav-products" onclick="showView('products')" data-mobview="products"><span class="mob-nav-icon">◧</span><span>Produkte</span></div>
     <div class="mob-nav-item" id="mob-nav-service" style="display:none;" onclick="showView('service')" data-mobview="service"><span class="mob-nav-icon">▶</span><span>Service</span></div>
@@ -393,6 +405,27 @@
       <div class="table-wrap" id="bookings-table-wrap" style="overflow-x:auto;">
         <table style="min-width:700px;"><thead><tr><th>ID</th><th>Raum</th><th>Standort</th><th>Datum</th><th>Von</th><th>Bis</th><th>Kostenstelle</th><th>Teilnehmer</th><th>Produkte</th><th>Status</th><th style="position:sticky;right:0;background:var(--surface2);">Aktionen</th></tr></thead>
         <tbody id="bookings-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <div class="view" id="view-calendar">
+      <div class="page-header">
+        <div class="page-title">Kal<span>ender</span></div>
+        <div class="flex gap-2" style="align-items:center;">
+          <button class="btn btn-secondary btn-sm" onclick="calMonthShift(-1)">‹</button>
+          <div id="cal-month-label" style="font-family:'DM Mono',monospace;font-size:13px;min-width:140px;text-align:center;"></div>
+          <button class="btn btn-secondary btn-sm" onclick="calMonthShift(1)">›</button>
+          <button class="btn btn-secondary btn-sm" onclick="calGoToday()">Heute</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="cal-weekdays">
+        <div class="cal-weekday">Mo</div><div class="cal-weekday">Di</div><div class="cal-weekday">Mi</div><div class="cal-weekday">Do</div><div class="cal-weekday">Fr</div><div class="cal-weekday">Sa</div><div class="cal-weekday">So</div>
+      </div>
+      <div class="cal-grid" id="cal-days"></div>
+      <div class="table-wrap" style="margin-top:20px;">
+        <div class="table-header"><div class="table-title" id="cal-selected-title">Kein Tag ausgewählt</div></div>
+        <table><thead><tr><th>Raum</th><th>Standort</th><th>Datum / Zeit</th><th>Kostenstelle</th><th>Teilnehmer</th><th>Produkte</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <tbody id="cal-day-tbody"><tr><td colspan="8" class="empty">Datum im Kalender auswählen.</td></tr></tbody></table>
       </div>
     </div>
 
@@ -719,14 +752,14 @@ function doLogin(){
 }
 
 const VIEW_PERMISSIONS={
-  admin:['overview','bookings','billing','products','stammdaten','settings','service'],
-  user:['overview','bookings','billing','products','settings'],
+  admin:['overview','bookings','calendar','billing','products','stammdaten','settings','service'],
+  user:['overview','bookings','calendar','billing','products','settings'],
   service:['service']
 };
 function applyRoleNav(){
   const role=currentUser?.role||'user';
   const allowed=VIEW_PERMISSIONS[role]||VIEW_PERMISSIONS.user;
-  const map={overview:'overview',bookings:'bookings',billing:'billing',products:'products',service:'service',stammdaten:'stammdaten',settings:'settings'};
+  const map={overview:'overview',bookings:'bookings',calendar:'calendar',billing:'billing',products:'products',service:'service',stammdaten:'stammdaten',settings:'settings'};
   Object.keys(map).forEach(v=>{
     const sn=document.getElementById('nav-'+map[v]);if(sn)sn.style.display=allowed.includes(v)?'flex':'none';
     const mn=document.getElementById('mob-nav-'+map[v]);if(mn&&map[v]!=='stammdaten'&&map[v]!=='settings')mn.style.display=allowed.includes(v)?'flex':'none';
@@ -762,7 +795,7 @@ function showView(name){
   const sn=document.querySelector('[data-view="'+name+'"]');if(sn)sn.classList.add('active');
   const mn=document.querySelector('[data-mobview="'+name+'"]');if(mn)mn.classList.add('active');
   if(name==='settings'){const mt=document.querySelector('[data-mobview="stammdaten"]');if(mt)mt.classList.add('active');}
-  if(name==='overview')renderOverview();if(name==='bookings')renderBookings();if(name==='billing')renderBillingList();
+  if(name==='overview')renderOverview();if(name==='bookings')renderBookings();if(name==='calendar')renderCalendar();if(name==='billing')renderBillingList();
   if(name==='products')renderProducts();if(name==='stammdaten')renderStammdaten();if(name==='settings')renderSettings();
   if(name==='service')renderServiceView();
   window.scrollTo(0,0);
@@ -798,6 +831,54 @@ function renderBookings(){
   tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,false)).join(''):'<tr><td colspan="11" class="empty">Keine Buchungen gefunden.</td></tr>';
 }
 
+let calState={year:new Date().getFullYear(),month:new Date().getMonth(),selected:null};
+function calMonthShift(n){
+  calState.month+=n;
+  if(calState.month<0){calState.month=11;calState.year--;}
+  if(calState.month>11){calState.month=0;calState.year++;}
+  calState.selected=null;
+  renderCalendar();
+}
+function calGoToday(){
+  const t=new Date();calState.year=t.getFullYear();calState.month=t.getMonth();calState.selected=t.toISOString().slice(0,10);
+  renderCalendar();
+}
+function calDatesWithBookings(){
+  const set=new Set();visibleBookings().forEach(b=>{if(b.date)set.add(b.date);});return set;
+}
+function renderCalendar(){
+  const {year,month}=calState;
+  const label=document.getElementById('cal-month-label');
+  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  if(label)label.textContent=monthNames[month]+' '+year;
+  const firstDay=new Date(year,month,1);
+  let startOffset=firstDay.getDay()-1;if(startOffset<0)startOffset=6;
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const todayStr=new Date().toISOString().slice(0,10);
+  const withBk=calDatesWithBookings();
+  let html='';
+  for(let i=0;i<startOffset;i++)html+='<div class="cal-day empty-day"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const cls=['cal-day'];
+    if(dateStr===todayStr)cls.push('today');
+    if(dateStr===calState.selected)cls.push('selected');
+    html+=`<div class="${cls.join(' ')}" onclick="calSelectDay('${dateStr}')">${d}${withBk.has(dateStr)?'<span class="cal-dot"></span>':''}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML=html;
+  calRenderDayList();
+}
+function calSelectDay(dateStr){calState.selected=dateStr;renderCalendar();}
+function calRenderDayList(){
+  const title=document.getElementById('cal-selected-title');
+  const tbody=document.getElementById('cal-day-tbody');
+  if(!calState.selected){title.textContent='Kein Tag ausgewählt';tbody.innerHTML='<tr><td colspan="8" class="empty">Datum im Kalender auswählen.</td></tr>';return;}
+  const d=new Date(calState.selected);
+  const opts={weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'};
+  title.textContent='Aufträge am '+d.toLocaleDateString('de-DE',opts);
+  const bk=visibleBookings().filter(b=>b.date===calState.selected);
+  tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,true)).join(''):'<tr><td colspan="8" class="empty">Keine Aufträge an diesem Tag.</td></tr>';
+}
 function roomLocationName(roomName){
   const r=state.rooms.find(x=>x.name===roomName);if(!r||!r.location_id)return '—';
   const l=state.locations.find(x=>x.id===r.location_id);return l?l.name:'—';
