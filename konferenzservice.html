@@ -30,27 +30,27 @@
   body.light .page-title span{color:#555;}
   body.light .sidebar-logo h1 span{color:#555;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:16px;}
   #loading-overlay{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px;}
   #loading-overlay.hidden{display:none;}
   .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .loading-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
   #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;}
-  .login-box{background:var(--surface);border:1px solid var(--border);padding:48px;width:400px;position:relative;}
+  .login-box{background:var(--surface);border:1px solid var(--border);padding:48px;width:500px;position:relative;}
   .login-box::before{content:'';position:absolute;top:-2px;left:-2px;width:40px;height:40px;border-top:2px solid var(--accent);border-left:2px solid var(--accent);}
   .login-box::after{content:'';position:absolute;bottom:-2px;right:-2px;width:40px;height:40px;border-bottom:2px solid var(--accent);border-right:2px solid var(--accent);}
   .login-title{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;}
   .login-title span{color:var(--accent);}
   .login-sub{color:var(--muted);font-size:13px;margin-bottom:32px;font-family:'DM Mono',monospace;line-height:1.6;}
   #app{display:none;min-height:100vh;}
-  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;}
   .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
   .sidebar-logo h1{font-size:16px;font-weight:800;letter-spacing:-0.3px;}
   .sidebar-logo h1 span{color:var(--accent);}
   .sidebar-logo p{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:3px;line-height:1.5;}
   .nav{flex:1;padding:16px 0;}
-  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);border-left:3px solid transparent;transition:all 0.15s;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:15px;font-weight:600;color:var(--muted);border-left:3px solid transparent;transition:all 0.15s;}
   .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
   .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(232,255,71,0.05);}
   .nav-icon{font-size:16px;width:20px;text-align:center;}
@@ -58,8 +58,8 @@
   .sidebar-user{font-weight:500;color:var(--text);font-size:12px;margin-bottom:4px;}
   .logout-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;padding:0;margin-top:8px;}
   .logout-btn:hover{text-decoration:underline;}
-  .main{margin-left:220px;padding:32px;min-height:100vh;}
-  #session-bar{position:fixed;top:0;left:220px;right:0;height:3px;background:var(--border);z-index:200;}
+  .main{margin-left:260px;padding:32px;min-height:100vh;}
+  #session-bar{position:fixed;top:0;left:260px;right:0;height:3px;background:var(--border);z-index:200;}
   #session-progress{height:100%;background:var(--accent);transition:width 1s linear;}
   #session-warning{display:none;position:fixed;top:12px;right:16px;background:var(--surface);border:1px solid var(--orange);color:var(--orange);padding:8px 14px;font-size:12px;font-family:'DM Mono',monospace;z-index:300;}
   .view{display:none;}
@@ -80,7 +80,7 @@
   .table-title{font-size:14px;font-weight:700;}
   table{width:100%;border-collapse:collapse;}
   th{text-align:left;padding:12px 20px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);background:var(--surface2);}
-  td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border);}
+  td{padding:12px 20px;font-size:15px;border-bottom:1px solid var(--border);}
   tr:last-child td{border-bottom:none;}
   tr:hover td{background:rgba(255,255,255,0.02);}
   .badge{display:inline-block;padding:2px 8px;font-size:11px;font-family:'DM Mono',monospace;font-weight:500;border-radius:2px;}
@@ -88,7 +88,7 @@
   .badge-active{background:rgba(71,255,138,0.15);color:var(--green);}
   .badge-done{background:rgba(119,119,119,0.15);color:var(--muted);}
   .badge-billed{background:rgba(71,255,224,0.15);color:var(--accent2);}
-  .btn{padding:9px 18px;font-size:13px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+  .btn{padding:9px 18px;font-size:15px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
   .btn-primary{background:var(--accent);color:#000;}
   .btn-primary:hover{background:#d4e83f;}
   .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
@@ -99,8 +99,8 @@
   .btn-icon{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;}
   .btn-icon:hover{color:var(--text);}
   .form-group{margin-bottom:18px;}
-  label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;}
-  input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;font-size:13px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.15s;}
+  label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;}
+  input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:9px 12px;font-size:15px;font-family:'Syne',sans-serif;outline:none;transition:border-color 0.15s;}
   input:focus,select:focus,textarea:focus{border-color:var(--accent);}
   select option{background:var(--surface2);}
   textarea{resize:vertical;min-height:80px;}
@@ -126,6 +126,11 @@
   .billing-item{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
   .billing-item:last-child{border-bottom:none;}
   .billing-item input{padding:6px 10px;}
+  .service-item{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .service-item:last-child{border-bottom:none;}
+  .service-item input{padding:6px 10px;}
+  .service-list-row{transition:border-color 0.15s,background 0.15s;}
+  .service-list-row:hover{border-color:var(--accent);background:var(--surface2);}
   .cat-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
   .cat-tab{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;}
   .cat-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(232,255,71,0.05);}
@@ -247,6 +252,8 @@
     .modal-footer .btn{width:100%;text-align:center;padding:12px;}
     .billing-item{grid-template-columns:1fr 1fr;row-gap:6px;}
     .billing-item>div:nth-child(1){grid-column:1/-1;}
+    .service-item{grid-template-columns:1fr 1fr;row-gap:6px;}
+    .service-item>div:nth-child(1){grid-column:1/-1;}
     .btn{padding:11px 16px;min-height:44px;}
     .btn-sm{padding:8px 12px;min-height:36px;font-size:12px;}
     .qty-btn{width:34px;height:34px;font-size:18px;}
@@ -260,9 +267,37 @@
     .empty{padding:24px;font-size:12px;}
     #sync-indicator{bottom:calc(72px + env(safe-area-inset-bottom) + 8px);}
   }
+
+  #print-area{display:none;}
+  @media print{
+    body *{visibility:hidden;}
+    #print-area,#print-area *{visibility:visible;}
+    #print-area{display:block;position:absolute;left:0;top:0;width:100%;padding:20px;color:#000;background:#fff;}
+    #print-area h1{font-size:22px;margin-bottom:4px;}
+    #print-area .print-meta{font-size:12px;color:#555;margin-bottom:16px;}
+    #print-area .print-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #999;}
+    #print-area .print-fact-label{font-size:10px;color:#666;text-transform:uppercase;}
+    #print-area .print-fact-value{font-size:14px;font-weight:700;}
+    #print-area .print-note{margin-bottom:16px;font-size:13px;}
+    #print-area table{width:100%;border-collapse:collapse;font-size:14px;}
+    #print-area th,#print-area td{text-align:left;padding:8px 6px;border-bottom:1px solid #ccc;}
+    #print-area .print-check{width:24px;height:24px;border:1.5px solid #333;display:inline-block;}
+  }
 </style>
 </head>
+
 <body>
+
+<div id="print-area">
+  <h1 id="print-title"></h1>
+  <div class="print-meta" id="print-meta"></div>
+  <div class="print-facts" id="print-facts"></div>
+  <div class="print-note" id="print-note"></div>
+  <table>
+    <thead><tr><th>✓</th><th>Produkt</th><th>Menge</th></tr></thead>
+    <tbody id="print-products"></tbody>
+  </table>
+</div>
 
 <div id="loading-overlay">
   <div class="spinner"></div>
@@ -273,7 +308,7 @@
 <div id="login-screen" style="display:none">
   <div class="login-box">
     <div class="login-title">Konferenz<span>Service</span></div>
-    <div class="login-sub">// Dashboard v2.0<br>// Stand 21.04.2025 14:30</div>
+    <div class="login-sub" id="login-version-info">// Dashboard v2.5<br>// Stand 22.04.2026 10:30</div>
     <div class="form-group"><label>Benutzername</label><input type="text" id="login-user" placeholder="Name eingeben" /></div>
     <div class="form-group"><label>PIN</label><input type="password" id="login-pin" placeholder="••••" maxlength="6" /></div>
     <div id="login-error" style="color:var(--danger);font-size:12px;font-family:'DM Mono',monospace;margin-bottom:12px;display:none;">Ungültige Zugangsdaten.</div>
@@ -297,15 +332,16 @@
   <div class="sidebar">
     <div class="sidebar-logo">
       <h1>K<span class="logo-text">onferenz</span><span style="color:var(--accent)">S</span><span class="logo-text" style="color:var(--accent)">ervice</span></h1>
-      <p>// v2.0<br>// 21.04.2025 14:30</p>
+      <p id="sidebar-version-info">// v2.5<br>// 22.04.2026 10:30</p>
     </div>
     <nav class="nav">
-      <div class="nav-item active" onclick="showView('overview')" data-view="overview"><span class="nav-icon">◈</span><span class="nav-label"> Übersicht</span></div>
-      <div class="nav-item" onclick="showView('bookings')" data-view="bookings"><span class="nav-icon">◉</span><span class="nav-label"> Buchungen</span></div>
-      <div class="nav-item" onclick="showView('billing')" data-view="billing"><span class="nav-icon">◎</span><span class="nav-label"> Abrechnung</span></div>
-      <div class="nav-item" onclick="showView('products')" data-view="products"><span class="nav-icon">◧</span><span class="nav-label"> Produkte</span></div>
-      <div class="nav-item" onclick="showView('stammdaten')" data-view="stammdaten"><span class="nav-icon">◫</span><span class="nav-label"> Stammdaten</span></div>
-      <div class="nav-item" onclick="showView('settings')" data-view="settings"><span class="nav-icon">◌</span><span class="nav-label"> Einstellungen</span></div>
+      <div class="nav-item active" id="nav-overview" onclick="showView('overview')" data-view="overview"><span class="nav-icon">◈</span><span class="nav-label"> Übersicht</span></div>
+      <div class="nav-item" id="nav-bookings" onclick="showView('bookings')" data-view="bookings"><span class="nav-icon">◉</span><span class="nav-label"> Buchungen</span></div>
+      <div class="nav-item" id="nav-billing" onclick="showView('billing')" data-view="billing"><span class="nav-icon">◎</span><span class="nav-label"> Abrechnung</span></div>
+      <div class="nav-item" id="nav-products" onclick="showView('products')" data-view="products"><span class="nav-icon">◧</span><span class="nav-label"> Produkte</span></div>
+      <div class="nav-item" id="nav-service" style="display:none;" onclick="showView('service')" data-view="service"><span class="nav-icon">▶</span><span class="nav-label"> Service</span></div>
+      <div class="nav-item" id="nav-stammdaten" style="display:none;" onclick="showView('stammdaten')" data-view="stammdaten"><span class="nav-icon">◫</span><span class="nav-label"> Stammdaten</span></div>
+      <div class="nav-item" id="nav-settings" onclick="showView('settings')" data-view="settings"><span class="nav-icon">◌</span><span class="nav-label"> Einstellungen</span></div>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user" id="sidebar-username">—</div>
@@ -316,16 +352,17 @@
   </div>
 
   <div id="mobile-bottomnav" style="display:none">
-    <div class="mob-nav-item active" onclick="showView('overview')" data-mobview="overview"><span class="mob-nav-icon">◈</span><span>Übersicht</span></div>
-    <div class="mob-nav-item" onclick="showView('bookings')" data-mobview="bookings"><span class="mob-nav-icon">◉</span><span>Buchungen</span></div>
-    <div class="mob-nav-item" onclick="showView('billing')" data-mobview="billing"><span class="mob-nav-icon">◎</span><span>Abrechnung</span></div>
-    <div class="mob-nav-item" onclick="showView('products')" data-mobview="products"><span class="mob-nav-icon">◧</span><span>Produkte</span></div>
-    <div class="mob-nav-item" onclick="showView('stammdaten')" data-mobview="stammdaten"><span class="mob-nav-icon">◫</span><span>Mehr</span></div>
+    <div class="mob-nav-item active" id="mob-nav-overview" onclick="showView('overview')" data-mobview="overview"><span class="mob-nav-icon">◈</span><span>Übersicht</span></div>
+    <div class="mob-nav-item" id="mob-nav-bookings" onclick="showView('bookings')" data-mobview="bookings"><span class="mob-nav-icon">◉</span><span>Buchungen</span></div>
+    <div class="mob-nav-item" id="mob-nav-billing" onclick="showView('billing')" data-mobview="billing"><span class="mob-nav-icon">◎</span><span>Abrechnung</span></div>
+    <div class="mob-nav-item" id="mob-nav-products" onclick="showView('products')" data-mobview="products"><span class="mob-nav-icon">◧</span><span>Produkte</span></div>
+    <div class="mob-nav-item" id="mob-nav-service" style="display:none;" onclick="showView('service')" data-mobview="service"><span class="mob-nav-icon">▶</span><span>Service</span></div>
+    <div class="mob-nav-item" id="mob-nav-stammdaten" onclick="showView('stammdaten')" data-mobview="stammdaten"><span class="mob-nav-icon">◫</span><span>Mehr</span></div>
   </div>
 
   <div class="main">
     <div class="view active" id="view-overview">
-      <div class="page-header"><div class="page-title">Über<span>sicht</span></div><button class="btn btn-primary" onclick="openBookingModal()">+ Neue Buchung</button></div>
+      <div class="page-header"><div class="page-title">Über<span>sicht</span> <span style="font-size:16px;color:var(--muted);font-weight:400;margin-left:16px;" id="overview-date"></span></div><button class="btn btn-primary" onclick="openBookingModal()">+ Neue Buchung</button></div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-label">Buchungen Heute</div><div class="stat-value" id="stat-today">0</div></div>
         <div class="stat-card green"><div class="stat-label">Aktive Buchungen</div><div class="stat-value" id="stat-active">0</div></div>
@@ -334,7 +371,7 @@
       </div>
       <div class="table-wrap">
         <div class="table-header"><div class="table-title">Heutige Buchungen</div></div>
-        <table><thead><tr><th>Raum</th><th>Datum / Zeit</th><th>Kostenstelle</th><th>Produkte</th><th>Status</th><th>Aktionen</th></tr></thead>
+        <table><thead><tr><th>Raum</th><th>Standort</th><th>Datum / Zeit</th><th>Kostenstelle</th><th>Teilnehmer</th><th>Produkte</th><th>Status</th><th>Aktionen</th></tr></thead>
         <tbody id="today-tbody"><tr><td colspan="6" class="empty">Keine Buchungen heute.</td></tr></tbody></table>
       </div>
     </div>
@@ -354,7 +391,7 @@
         </select>
       </div>
       <div class="table-wrap" id="bookings-table-wrap" style="overflow-x:auto;">
-        <table style="min-width:700px;"><thead><tr><th>ID</th><th>Raum</th><th>Datum</th><th>Von</th><th>Bis</th><th>Kostenstelle</th><th>Produkte</th><th>Status</th><th style="position:sticky;right:0;background:var(--surface2);">Aktionen</th></tr></thead>
+        <table style="min-width:700px;"><thead><tr><th>ID</th><th>Raum</th><th>Standort</th><th>Datum</th><th>Von</th><th>Bis</th><th>Kostenstelle</th><th>Teilnehmer</th><th>Produkte</th><th>Status</th><th style="position:sticky;right:0;background:var(--surface2);">Aktionen</th></tr></thead>
         <tbody id="bookings-tbody"></tbody></table>
       </div>
     </div>
@@ -395,15 +432,27 @@
         </div>
       </div>
       <div class="form-row">
-        <div><div class="settings-section"><div class="settings-section-header">Konferenzräume</div><div class="settings-body">
-          <div class="flex gap-2"><input type="text" id="new-room" placeholder="Raumname" style="flex:1" /><button class="btn btn-primary btn-sm" onclick="addRoom()">+</button></div>
-          <div class="chip-list" id="room-chips"></div>
+        <div><div class="settings-section"><div class="settings-section-header">Standorte</div><div class="settings-body">
+          <div class="flex gap-2"><input type="text" id="new-location" placeholder="Standortname" style="flex:1" /><button class="btn btn-primary btn-sm" onclick="addLocation()">+</button></div>
+          <div class="chip-list" id="location-chips"></div>
         </div></div></div>
         <div><div class="settings-section"><div class="settings-section-header">Kostenstellen</div><div class="settings-body">
           <div class="flex gap-2"><input type="text" id="new-ks" placeholder="Kostenstelle" style="flex:1" /><button class="btn btn-primary btn-sm" onclick="addKostenstelle()">+</button></div>
           <div class="chip-list" id="ks-chips"></div>
         </div></div></div>
       </div>
+      <div class="settings-section"><div class="settings-section-header">Konferenzräume</div><div class="settings-body">
+        <div class="flex gap-2" style="margin-bottom:14px;flex-wrap:wrap;">
+          <input type="text" id="new-room" placeholder="Raumname" style="flex:1;min-width:160px" />
+          <select id="new-room-location" style="max-width:220px"></select>
+          <button class="btn btn-primary btn-sm" onclick="addRoom()">+</button>
+        </div>
+        <div class="table-wrap" style="border:none"><table><thead><tr><th>Raum</th><th>Standort</th><th>Aktionen</th></tr></thead><tbody id="rooms-tbody"></tbody></table></div>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-header">Benutzer</div><div class="settings-body">
+        <div class="table-wrap" style="border:none"><table><thead><tr><th>Benutzer</th><th>Rolle</th><th>Standort</th><th>Aktionen</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
+        <div style="margin-top:16px"><button class="btn btn-secondary btn-sm" onclick="openUserModal()">+ Benutzer hinzufügen</button></div>
+      </div></div>
       <div class="settings-section"><div class="settings-section-header">Produktkategorien</div><div class="settings-body">
         <div class="flex gap-2"><input type="text" id="new-cat" placeholder="Kategoriename" style="flex:1;max-width:280px" /><button class="btn btn-primary btn-sm" onclick="addCategory()">+</button></div>
         <div class="chip-list" id="cat-chips"></div>
@@ -421,10 +470,6 @@
       <div class="settings-section"><div class="settings-section-header">Sitzung</div><div class="settings-body">
         <div class="form-group" style="max-width:320px"><label>Automatische Abmeldung nach (Minuten)</label><input type="number" id="setting-timeout" min="1" max="480" value="30" onchange="saveSettingsToDB()" /></div>
         <div class="text-muted">Standard: 30 Minuten. Aktivität verlängert die Sitzung automatisch.</div>
-      </div></div>
-      <div class="settings-section"><div class="settings-section-header">Benutzer</div><div class="settings-body">
-        <div class="table-wrap" style="border:none"><table><thead><tr><th>Benutzer</th><th>Rolle</th><th>Aktionen</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
-        <div style="margin-top:16px"><button class="btn btn-secondary btn-sm" onclick="openUserModal()">+ Benutzer hinzufügen</button></div>
       </div></div>
       <div class="settings-section"><div class="settings-section-header">Schnellauswahl</div><div class="settings-body">
         <div class="text-muted" style="margin-bottom:12px;">Produkte im Buchungsdialog als fixer Block oben. Reihenfolge per Drag & Drop.</div>
@@ -450,6 +495,26 @@
         </div>
         <div class="text-muted" style="margin-top:10px;">Daten werden in Supabase gespeichert und sind für alle Nutzer verfügbar.</div>
       </div></div>
+      <div class="settings-section" id="admin-version-section" style="display:none;"><div class="settings-section-header">App-Version</div><div class="settings-body">
+        <div class="text-muted" style="margin-bottom:10px;">Wird beim Login-Screen und in der Sidebar angezeigt. Bei jedem Release aktualisieren!</div>
+        <div class="form-row">
+          <div class="form-group"><label>Version</label><input type="text" id="setting-app-version" placeholder="z.B. v2.6" /></div>
+          <div class="form-group"><label>Stand (Datum/Zeit)</label><input type="text" id="setting-app-builddate" placeholder="z.B. 24.07.2026 14:00" /></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveAppVersion()">Version speichern</button>
+      </div></div>
+    </div>
+
+    <div class="view" id="view-service">
+      <div class="page-header"><div class="page-title">Ser<span>vice</span></div></div>
+      <div class="settings-section"><div class="settings-section-header">Vorbereitung &amp; Lieferung</div><div class="settings-body">
+        <div class="text-muted" style="margin-bottom:14px;">Bevorstehende und laufende Buchungen an deinem Standort. Produkte richten, ausliefern, Lieferung quittieren.</div>
+        <div id="service-prep-list"></div>
+      </div></div>
+      <div class="settings-section"><div class="settings-section-header">Verbrauch erfassen</div><div class="settings-body">
+        <div class="text-muted" style="margin-bottom:14px;">Veranstaltungen an deinem Standort, die von einem Admin/Nutzer bereits als beendet markiert wurden. Tatsächlichen Verbrauch eintragen — der Rücklauf wird automatisch berechnet.</div>
+        <div id="service-consumption-list"></div>
+      </div></div>
     </div>
   </div>
 </div>
@@ -460,7 +525,7 @@
     <div class="modal-header"><div class="modal-title" id="booking-modal-title">Neue Buchung</div><button class="btn-icon" onclick="closeModal('booking-modal')">✕</button></div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label>Konferenzraum</label><select id="bk-room"></select></div>
+        <div class="form-group"><label>Konferenzraum</label><select id="bk-room" onchange="updateBkLocationDisplay()"></select><div id="bk-room-location" style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:5px;"></div></div>
         <div class="form-group"><label>Kostenstelle</label><select id="bk-ks"></select></div>
       </div>
       <div class="form-row3">
@@ -468,13 +533,28 @@
         <div class="form-group"><label>Von</label><input type="time" id="bk-from" /></div>
         <div class="form-group"><label>Bis</label><input type="time" id="bk-to" /></div>
       </div>
-      <div class="form-group"><label>Bemerkung</label><textarea id="bk-note" placeholder="Optional..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Teilnehmerzahl</label><input type="number" id="bk-participants" min="1" step="1" value="1" /></div>
+      </div>
+      <div class="form-group"><label>Bemerkung</label><textarea id="bk-note" placeholder="Optional..." style="resize:vertical;min-height:40px;max-height:60px;overflow-y:auto;"></textarea></div>
       <hr class="divider">
-      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Produkte auswählen</div>
-      <div id="bk-quickselect" style="margin-bottom:12px;"></div>
-      <input type="text" id="bk-search" placeholder="Suche nach Name..." oninput="renderBkProducts()" style="margin-bottom:10px;" />
-      <div class="cat-tabs" id="bk-cat-tabs"></div>
-      <div class="product-list" id="bk-product-list"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:400px;margin-bottom:16px;">
+        <!-- LINKE SEITE: Hinzugefügte Produkte -->
+        <div style="display:flex;flex-direction:column;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent);">Hinzugefügte Produkte</div>
+          <div id="bk-added-products" style="background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:12px;flex:1;overflow-y:auto;">
+            <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Noch keine Produkte hinzugefügt.</div>
+          </div>
+        </div>
+        <!-- RECHTE SEITE: Verfügbare Produkte -->
+        <div style="display:flex;flex-direction:column;">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Verfügbare Produkte</div>
+          <div id="bk-quickselect" style="margin-bottom:10px;"></div>
+          <input type="text" id="bk-search" placeholder="Suche nach Name..." oninput="renderBkProducts()" style="margin-bottom:10px;" />
+          <select id="bk-cat-select" onchange="setBkFilter(this.value)" style="margin-bottom:10px;width:100%;"></select>
+          <div class="product-list" id="bk-product-list" style="flex:1;"></div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('booking-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveBooking()">Buchung speichern</button></div>
   </div>
@@ -514,13 +594,42 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="service-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title">Verbrauch erfassen</div><button class="btn-icon" onclick="closeModal('service-modal')">✕</button></div>
+    <div class="modal-body">
+      <div id="service-info" style="font-size:13px;color:var(--muted);margin-bottom:16px;font-family:'DM Mono',monospace;"></div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;">BESTELLT → VERBRAUCHT → RÜCKLAUF</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase">
+        <div>Produkt</div><div>Bestellt</div><div>Verbraucht</div><div>Rücklauf</div>
+      </div>
+      <div id="service-items"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('service-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveServiceConsumption()">Verbrauch speichern</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="service-detail-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header"><div class="modal-title" id="service-detail-title">Buchung</div><button class="btn-icon" onclick="closeModal('service-detail-modal')">✕</button></div>
+    <div class="modal-body">
+      <div id="service-detail-badges" style="margin-bottom:16px;"></div>
+      <div id="service-detail-facts" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border);"></div>
+      <div id="service-detail-note"></div>
+      <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px;">Produkte zum Ausliefern</div><div id="service-detail-products"></div></div>
+    </div>
+    <div class="modal-footer" id="service-detail-footer"></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="user-modal">
   <div class="modal">
     <div class="modal-header"><div class="modal-title">Benutzer hinzufügen</div><button class="btn-icon" onclick="closeModal('user-modal')">✕</button></div>
     <div class="modal-body">
       <div class="form-group"><label>Benutzername</label><input type="text" id="user-name" placeholder="Name" /></div>
       <div class="form-group"><label>PIN</label><input type="password" id="user-pin" placeholder="••••" maxlength="6" /></div>
-      <div class="form-group"><label>Rolle</label><select id="user-role"><option value="user">Benutzer</option><option value="admin">Admin</option></select></div>
+      <div class="form-group"><label>Rolle</label><select id="user-role"><option value="user">Benutzer</option><option value="service">Service</option><option value="admin">Admin</option></select></div>
+      <div class="form-group"><label>Standort</label><select id="user-location"></select></div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('user-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveUser()">Speichern</button></div>
   </div>
@@ -549,21 +658,42 @@ function showSync(s,m){const e=document.getElementById('sync-indicator');e.class
 async function loadAll(){
   try{
     console.log('loadAll: START');
-    const[users,rooms,cc,cats,prods,bks,sett]=await Promise.all([
+    const[users,rooms,cc,cats,prods,bks,sett,meta,locs]=await Promise.all([
       sb('users?select=*&order=id'),sb('rooms?select=*&order=id'),sb('costcenters?select=*&order=id'),
       sb('categories?select=*&order=id'),sb('products?select=*&order=id'),
-      sb('bookings?select=*&order=id'),sb('settings?select=*&id=eq.1')
+      sb('bookings?select=*&order=id'),sb('settings?select=*&id=eq.1'),sb('app_meta?select=*&id=eq.1'),
+      sb('locations?select=*&order=id')
     ]);
     console.log('loadAll: users=',users,'rooms=',rooms);
     state.users=(users||[]);
-    state.rooms=(rooms||[]).map(r=>r.name);
+    state.locations=(locs||[]);
+    state.rooms=(rooms||[]).map(r=>({id:r.id,name:r.name,location_id:r.location_id}));
     state.costcenters=(cc||[]).map(c=>c.name);
     state.categories=(cats||[]).map(c=>c.name);
     state.products=(prods||[]).map(p=>({id:p.id,plu:p.plu,name:p.name,category:p.category,unit:p.unit,price:parseFloat(p.price),inactive:p.inactive}));
-    state.bookings=(bks||[]).map(b=>({id:b.id,room:b.room,costcenter:b.costcenter,date:b.date,from:b.time_from?.slice(0,5),to:b.time_to?.slice(0,5),note:b.note,status:b.status,products:b.products||[],billingData:b.billing_data||{},billedTotal:parseFloat(b.billed_total)||0,billedAt:b.billed_at,createdAt:b.created_at}));
+    state.bookings=(bks||[]).map(b=>({id:b.id,room:b.room,costcenter:b.costcenter,date:b.date,from:b.time_from?.slice(0,5),to:b.time_to?.slice(0,5),note:b.note,participants:b.participants||1,status:b.status,deliveryStatus:b.delivery_status||'offen',products:b.products||[],billingData:b.billing_data||{},billedTotal:parseFloat(b.billed_total)||0,billedAt:b.billed_at,createdAt:b.created_at}));
     if(sett?.[0]){const s=sett[0];state.settings={timeout:s.timeout||30};state.favorites=s.favorites||[];state.quickSelect=s.quick_select||[];}
+    if(meta?.[0]){
+      const m=meta[0];
+      state.appMeta={version:m.version,build_date:m.build_date};
+      const txt=`// Dashboard ${m.version}<br>// Stand ${m.build_date}`;
+      const txtSidebar=`// ${m.version}<br>// ${m.build_date}`;
+      const lv=document.getElementById('login-version-info');if(lv)lv.innerHTML=txt;
+      const sv=document.getElementById('sidebar-version-info');if(sv)sv.innerHTML=txtSidebar;
+    }
     console.log('loadAll: DONE - users count:',state.users.length);
   }catch(e){console.error('loadAll ERROR:',e);throw e;}
+}
+
+function visibleRooms(){
+  if(currentUser?.role==='admin')return state.rooms;
+  return state.rooms.filter(r=>r.location_id&&currentUser?.location_id&&r.location_id===currentUser.location_id);
+}
+function visibleRoomNames(){return visibleRooms().map(r=>r.name);}
+function visibleBookings(){
+  if(currentUser?.role==='admin')return state.bookings;
+  const names=visibleRoomNames();
+  return state.bookings.filter(b=>names.includes(b.room));
 }
 
 async function saveGlobalSettings(){
@@ -581,8 +711,27 @@ function doLogin(){
   currentUser=found;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('sidebar-username').textContent=found.name+' ('+found.role+')';
-  startSession();refreshAll();
+  const locName=found.role==='admin'?'Alle Standorte':(state.locations.find(l=>l.id===found.location_id)?.name||'Kein Standort');
+  document.getElementById('sidebar-username').textContent=found.name+' ('+found.role+') · '+locName;
+  applyRoleNav();
+  startSession();
+  showView(found.role==='service'?'service':'overview');
+}
+
+const VIEW_PERMISSIONS={
+  admin:['overview','bookings','billing','products','stammdaten','settings','service'],
+  user:['overview','bookings','billing','products','settings'],
+  service:['service']
+};
+function applyRoleNav(){
+  const role=currentUser?.role||'user';
+  const allowed=VIEW_PERMISSIONS[role]||VIEW_PERMISSIONS.user;
+  const map={overview:'overview',bookings:'bookings',billing:'billing',products:'products',service:'service',stammdaten:'stammdaten',settings:'settings'};
+  Object.keys(map).forEach(v=>{
+    const sn=document.getElementById('nav-'+map[v]);if(sn)sn.style.display=allowed.includes(v)?'flex':'none';
+    const mn=document.getElementById('mob-nav-'+map[v]);if(mn&&map[v]!=='stammdaten'&&map[v]!=='settings')mn.style.display=allowed.includes(v)?'flex':'none';
+  });
+  const mehrTab=document.getElementById('mob-nav-stammdaten');if(mehrTab)mehrTab.style.display=(role==='service')?'none':'flex';
 }
 function doLogout(){currentUser=null;clearInterval(sessionTimer);document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('login-user').value='';document.getElementById('login-pin').value='';}
 document.getElementById('login-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -602,6 +751,10 @@ function tickSession(){
 document.addEventListener('mousemove',resetSession);document.addEventListener('keydown',resetSession);document.addEventListener('click',resetSession);
 
 function showView(name){
+  const role=currentUser?.role||'user';
+  const allowed=VIEW_PERMISSIONS[role]||VIEW_PERMISSIONS.user;
+  if(name==='stammdaten'&&role!=='admin')name='settings';
+  if(!allowed.includes(name))name=allowed[0];
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mob-nav-item').forEach(n=>n.classList.remove('active'));
@@ -611,29 +764,49 @@ function showView(name){
   if(name==='settings'){const mt=document.querySelector('[data-mobview="stammdaten"]');if(mt)mt.classList.add('active');}
   if(name==='overview')renderOverview();if(name==='bookings')renderBookings();if(name==='billing')renderBillingList();
   if(name==='products')renderProducts();if(name==='stammdaten')renderStammdaten();if(name==='settings')renderSettings();
+  if(name==='service')renderServiceView();
   window.scrollTo(0,0);
 }
 
 function renderOverview(){
   const today=new Date().toISOString().slice(0,10);
-  const tb=state.bookings.filter(b=>b.date===today);
-  const ac=state.bookings.filter(b=>b.status==='active');
-  const pe=state.bookings.filter(b=>b.status==='done');
+  const dateEl=document.getElementById('overview-date');
+  if(dateEl){
+    const d=new Date(today);
+    const opts={weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'};
+    const formatted=d.toLocaleDateString('de-DE',opts);
+    dateEl.textContent=formatted;
+  }
+  const tb=visibleBookings().filter(b=>b.date===today);
+  const ac=visibleBookings().filter(b=>b.status==='active');
+  const pe=visibleBookings().filter(b=>b.status==='done');
   const mo=new Date().toISOString().slice(0,7);
-  const rev=state.bookings.filter(b=>b.status==='billed'&&b.date?.startsWith(mo)).reduce((s,b)=>s+(b.billedTotal||0),0);
+  const rev=visibleBookings().filter(b=>b.status==='billed'&&b.date?.startsWith(mo)).reduce((s,b)=>s+(b.billedTotal||0),0);
   document.getElementById('stat-today').textContent=tb.length;document.getElementById('stat-active').textContent=ac.length;
   document.getElementById('stat-pending').textContent=pe.length;document.getElementById('stat-revenue').textContent=rev.toFixed(2)+' €';
   const tbody=document.getElementById('today-tbody');
-  tbody.innerHTML=tb.length?tb.map(b=>bookingRow(b,true)).join(''):'<tr><td colspan="6" class="empty">Keine Buchungen heute.</td></tr>';
+  const allBk=[...visibleBookings()].reverse();
+  tbody.innerHTML=allBk.length?allBk.map(b=>bookingRow(b,true)).join(''):'<tr><td colspan="8" class="empty">Keine Buchungen vorhanden.</td></tr>';
 }
 
 function renderBookings(){
-  populateFilter('filter-room',state.rooms);populateFilter('filter-ks',state.costcenters);
+  populateFilter('filter-room',visibleRoomNames());populateFilter('filter-ks',state.costcenters);
   const df=document.getElementById('filter-date').value,rf=document.getElementById('filter-room').value,kf=document.getElementById('filter-ks').value,sf=document.getElementById('filter-status').value;
-  let bk=[...state.bookings].reverse();
+  let bk=[...visibleBookings()].reverse();
   if(df)bk=bk.filter(b=>b.date===df);if(rf)bk=bk.filter(b=>b.room===rf);if(kf)bk=bk.filter(b=>b.costcenter===kf);if(sf)bk=bk.filter(b=>b.status===sf);
   const tbody=document.getElementById('bookings-tbody');
-  tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,false)).join(''):'<tr><td colspan="9" class="empty">Keine Buchungen gefunden.</td></tr>';
+  tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,false)).join(''):'<tr><td colspan="11" class="empty">Keine Buchungen gefunden.</td></tr>';
+}
+
+function roomLocationName(roomName){
+  const r=state.rooms.find(x=>x.name===roomName);if(!r||!r.location_id)return '—';
+  const l=state.locations.find(x=>x.id===r.location_id);return l?l.name:'—';
+}
+function updateBkLocationDisplay(){
+  const sel=document.getElementById('bk-room');const el=document.getElementById('bk-room-location');
+  if(!sel||!el)return;
+  const loc=roomLocationName(sel.value);
+  el.textContent='Standort: '+loc;
 }
 
 function bookingRow(b,compact){
@@ -641,10 +814,11 @@ function bookingRow(b,compact){
   const sl={pending:'Ausstehend',active:'Aktiv',done:'Abgeschl.',billed:'Abgerechnet'};
   const cnt=b.products?b.products.reduce((s,p)=>s+p.qty,0):0;
   const ia=currentUser?.role==='admin',lk=b.status==='billed'&&!ia;
+  const loc=roomLocationName(b.room);
   const ac=lk?`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</div>`
     :`<div class="flex gap-2"><button class="btn btn-secondary btn-sm" onclick="openBookingModal(${b.id})">✎</button>${b.status!=='billed'?`<button class="btn btn-secondary btn-sm" onclick="setStatus(${b.id},'${nextStatus(b.status)}')">${nextStatusLabel(b.status)}</button>`:''}${ia&&b.status==='billed'?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">€ Ansehen</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteBooking(${b.id})">✕</button></div>`;
-  if(compact)return`<tr><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date} ${b.from}–${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${ac}</td></tr>`;
-  return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.from}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td style="position:sticky;right:0;background:var(--surface)">${ac}</td></tr>`;
+  if(compact)return`<tr><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${loc}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date} ${b.from}–${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${ac}</td></tr>`;
+  return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${loc}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.from}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td style="position:sticky;right:0;background:var(--surface)">${ac}</td></tr>`;
 }
 
 function nextStatus(s){return s==='pending'?'active':s==='active'?'done':s==='done'?'billed':'billed';}
@@ -670,18 +844,22 @@ async function deleteBooking(id){
 function openBookingModal(id){
   editingBookingId=id||null;
   if(id){const b=state.bookings.find(x=>x.id===id);if(b?.status==='billed'&&currentUser?.role!=='admin'){alert('Nur Admins können abgerechnete Buchungen bearbeiten.');return;}}
+  const rn=visibleRoomNames();
+  if(!id&&!rn.length){alert(currentUser?.location_id?'Für deinen Standort sind keine Konferenzräume angelegt. Bitte an einen Administrator wenden.':'Dir ist kein Standort zugewiesen. Bitte an einen Administrator wenden.');return;}
   document.getElementById('booking-modal-title').textContent=id?'Buchung bearbeiten':'Neue Buchung';
-  populateSelect('bk-room',state.rooms);populateSelect('bk-ks',state.costcenters);
+  populateSelect('bk-room',rn);populateSelect('bk-ks',state.costcenters);
   window._bkProducts={};
-  if(id){const b=state.bookings.find(x=>x.id===id);document.getElementById('bk-room').value=b.room;document.getElementById('bk-ks').value=b.costcenter;document.getElementById('bk-date').value=b.date;document.getElementById('bk-from').value=b.from;document.getElementById('bk-to').value=b.to;document.getElementById('bk-note').value=b.note||'';if(b.products)b.products.forEach(p=>{window._bkProducts[p.id]=p.qty;});}
-  else{document.getElementById('bk-date').value=new Date().toISOString().slice(0,10);document.getElementById('bk-from').value='';document.getElementById('bk-to').value='';document.getElementById('bk-note').value='';}
-  renderBkCatTabs();renderBkQuickSelect();const s=document.getElementById('bk-search');if(s)s.value='';
+  if(id){const b=state.bookings.find(x=>x.id===id);document.getElementById('bk-room').value=b.room;document.getElementById('bk-ks').value=b.costcenter;document.getElementById('bk-date').value=b.date;document.getElementById('bk-from').value=b.from;document.getElementById('bk-to').value=b.to;document.getElementById('bk-note').value=b.note||'';document.getElementById('bk-participants').value=b.participants||1;if(b.products)b.products.forEach(p=>{window._bkProducts[p.id]=p.qty;});}
+  else{document.getElementById('bk-date').value=new Date().toISOString().slice(0,10);document.getElementById('bk-from').value='';document.getElementById('bk-to').value='';document.getElementById('bk-note').value='';document.getElementById('bk-participants').value=1;}
+  renderBkCatTabs();renderBkQuickSelect();renderBkAddedProducts();const s=document.getElementById('bk-search');if(s)s.value='';
+  updateBkLocationDisplay();
   document.getElementById('booking-modal').classList.add('open');
 }
 
 function renderBkCatTabs(){
   const hf=state.favorites?.length>0;const ac=['Alle',...(hf?['★ Favoriten']:[]),...state.categories];
-  document.getElementById('bk-cat-tabs').innerHTML=ac.map(c=>`<div class="cat-tab ${currentBkFilter===c||(c==='Alle'&&!currentBkFilter)?'active':''}" onclick="setBkFilter('${c}')">${c}</div>`).join('');
+  const sel=document.getElementById('bk-cat-select');if(!sel)return;
+  sel.innerHTML=ac.map(c=>`<option value="${c}" ${currentBkFilter===c||(c==='Alle'&&!currentBkFilter)?'selected':''}>${c}</option>`).join('');
   renderBkProducts();
 }
 function setBkFilter(cat){currentBkFilter=cat==='Alle'?'':cat;renderBkCatTabs();}
@@ -714,20 +892,23 @@ function changeBkQty(pid,delta){
   const e=document.getElementById('bkqty-'+pid);if(e)e.textContent=next;
   const q=document.getElementById('qqty-'+pid);if(q)q.textContent=next;
   renderBkQuickSelect();
+  renderBkAddedProducts();
 }
 
 async function saveBooking(){
   const room=document.getElementById('bk-room').value,ks=document.getElementById('bk-ks').value,date=document.getElementById('bk-date').value,from=document.getElementById('bk-from').value,to=document.getElementById('bk-to').value,note=document.getElementById('bk-note').value;
+  const participants=parseInt(document.getElementById('bk-participants').value);
   if(!room||!ks||!date||!from||!to){alert('Bitte alle Pflichtfelder ausfüllen.');return;}
+  if(!participants||participants<1){alert('Bitte eine gültige Teilnehmerzahl (mind. 1) angeben.');return;}
   const products=Object.entries(window._bkProducts).filter(([,q])=>q>0).map(([id,qty])=>({id:parseInt(id),qty}));
   showSync('saving','Speichern...');
   try{
     if(editingBookingId){
-      await sb('bookings?id=eq.'+editingBookingId,{method:'PATCH',prefer:'',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,products}});
-      const b=state.bookings.find(x=>x.id===editingBookingId);Object.assign(b,{room,costcenter:ks,date,from,to,note,products});
+      await sb('bookings?id=eq.'+editingBookingId,{method:'PATCH',prefer:'',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,participants,products}});
+      const b=state.bookings.find(x=>x.id===editingBookingId);Object.assign(b,{room,costcenter:ks,date,from,to,note,participants,products});
     }else{
-      const r=await sb('bookings',{method:'POST',prefer:'return=representation',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,products,status:'pending'}});
-      if(r?.[0]){const b=r[0];state.bookings.push({id:b.id,room,costcenter:ks,date,from,to,note,products,status:'pending',createdAt:b.created_at});}
+      const r=await sb('bookings',{method:'POST',prefer:'return=representation',body:{room,costcenter:ks,date,time_from:from,time_to:to,note,participants,products,status:'pending'}});
+      if(r?.[0]){const b=r[0];state.bookings.push({id:b.id,room,costcenter:ks,date,from,to,note,participants,products,status:'pending',deliveryStatus:'offen',createdAt:b.created_at});}
     }
     showSync('saved','Gespeichert');
   }catch(e){showSync('error','Fehler');console.error(e);}
@@ -736,7 +917,7 @@ async function saveBooking(){
 
 function renderBillingList(){
   const sf=document.getElementById('billing-filter-status').value,mf=document.getElementById('billing-filter-month').value;
-  let bk=[...state.bookings].reverse();if(sf)bk=bk.filter(b=>b.status===sf);if(mf)bk=bk.filter(b=>b.date?.startsWith(mf));
+  let bk=[...visibleBookings()].reverse();if(sf)bk=bk.filter(b=>b.status===sf);if(mf)bk=bk.filter(b=>b.date?.startsWith(mf));
   const tbody=document.getElementById('billing-tbody');
   if(!bk.length){tbody.innerHTML='<tr><td colspan="7" class="empty">Keine Einträge.</td></tr>';return;}
   const ia=currentUser?.role==='admin';
@@ -826,19 +1007,179 @@ async function deleteProduct(id){
   showSync('saving','Speichern...');try{await sb('products?id=eq.'+id,{method:'DELETE'});state.products=state.products.filter(x=>x.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderProducts();
 }
 
+// ========== SERVICE-ROLLE ==========
+let serviceBookingId=null;
+function renderServiceView(){
+  const bk=visibleBookings();
+  const prep=bk.filter(b=>b.status==='pending'||b.status==='active');
+  const consumption=bk.filter(b=>b.status==='done');
+  const prepEl=document.getElementById('service-prep-list');
+  const sm={pending:'badge-pending',active:'badge-active'};
+  const sl={pending:'Ausstehend',active:'Aktiv'};
+  const dm={offen:'badge-pending',vorbereitet:'badge-active',ausgeliefert:'badge-done'};
+  const dl={offen:'Offen',vorbereitet:'Vorbereitet',ausgeliefert:'Ausgeliefert'};
+  prepEl.innerHTML=prep.length?prep.map(b=>{
+    const ds=b.deliveryStatus||'offen';
+    const cnt=b.products?b.products.reduce((s,p)=>s+p.qty,0):0;
+    return`<div class="service-list-row" onclick="openServiceDetailModal(${b.id})" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px;cursor:pointer;">
+      <div><div style="font-weight:700;font-size:15px;">${b.room}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${b.date} ${b.from}–${b.to} · ${cnt} Pos.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span class="badge ${sm[b.status]}">${sl[b.status]}</span><span class="badge ${dm[ds]}">${dl[ds]}</span><span style="color:var(--muted);font-size:18px;">›</span></div>
+    </div>`;
+  }).join(''):'<div class="empty">Keine anstehenden Buchungen.</div>';
+
+  const consEl=document.getElementById('service-consumption-list');
+  consEl.innerHTML=consumption.length?consumption.map(b=>{
+    const erfasst=b.billingData&&Object.keys(b.billingData).length>0;
+    return`<div class="service-list-row" onclick="openServiceConsumptionModal(${b.id})" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px;cursor:pointer;">
+      <div><div style="font-weight:700;font-size:15px;">${b.room}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${b.date} ${b.from}–${b.to} · ${b.participants||1} Teilnehmer</div></div>
+      <div style="display:flex;gap:8px;align-items:center;">${erfasst?'<span class="badge badge-done">✓ erfasst</span>':''}<span style="color:var(--muted);font-size:18px;">›</span></div>
+    </div>`;
+  }).join(''):'<div class="empty">Keine Buchungen zur Verbrauchserfassung. Eine Buchung erscheint hier erst, sobald ein Admin oder Nutzer die Veranstaltung über "Buchungen" als beendet markiert hat.</div>';
+}
+
+function openServiceDetailModal(id){
+  const b=state.bookings.find(x=>x.id===id);if(!b)return;
+  const sm={pending:'badge-pending',active:'badge-active'};
+  const sl={pending:'Ausstehend',active:'Aktiv'};
+  const dm={offen:'badge-pending',vorbereitet:'badge-active',ausgeliefert:'badge-done'};
+  const dl={offen:'Offen',vorbereitet:'Vorbereitet',ausgeliefert:'Ausgeliefert'};
+  const ds=b.deliveryStatus||'offen';
+  document.getElementById('service-detail-title').textContent=b.room;
+  document.getElementById('service-detail-badges').innerHTML=`<span class="badge ${sm[b.status]}" style="font-size:12px;padding:5px 10px;margin-right:8px;">${sl[b.status]}</span><span class="badge ${dm[ds]}" style="font-size:12px;padding:5px 10px;">${dl[ds]}</span>`;
+  document.getElementById('service-detail-facts').innerHTML=`
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Standort</div><div style="font-size:14px;font-weight:600;">${roomLocationName(b.room)}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Datum</div><div style="font-size:14px;font-weight:600;">${b.date}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Zeit</div><div style="font-size:14px;font-weight:600;">${b.from}–${b.to}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Teilnehmer</div><div style="font-size:14px;font-weight:600;">${b.participants||1}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Kostenstelle</div><div style="font-size:14px;font-weight:600;">${b.costcenter}</div></div>`;
+  document.getElementById('service-detail-note').innerHTML=b.note?`<div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Bemerkung</div><div style="font-size:14px;">${b.note}</div></div>`:'';
+  const prodRows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;"><span>${pr.name}</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${p.qty} ${pr.unit}</span></div>`;}).filter(Boolean).join(''):'<div class="text-muted" style="padding:8px 0;">Keine Produkte in dieser Buchung.</div>';
+  document.getElementById('service-detail-products').innerHTML=prodRows;
+  const footer=document.getElementById('service-detail-footer');
+  if(ds==='offen')footer.innerHTML=`<button class="btn btn-secondary" onclick="printServiceBooking(${b.id})">Drucken</button><button class="btn btn-secondary" onclick="closeModal('service-detail-modal')">Schließen</button><button class="btn btn-primary" onclick="advanceDelivery(${b.id},'vorbereitet');closeModal('service-detail-modal')">Vorbereitet</button>`;
+  else if(ds==='vorbereitet')footer.innerHTML=`<button class="btn btn-secondary" onclick="printServiceBooking(${b.id})">Drucken</button><button class="btn btn-secondary" onclick="closeModal('service-detail-modal')">Schließen</button><button class="btn btn-primary" onclick="advanceDelivery(${b.id},'ausgeliefert');closeModal('service-detail-modal')">Ausgeliefert (quittieren)</button>`;
+  else footer.innerHTML=`<button class="btn btn-secondary" onclick="printServiceBooking(${b.id})">Drucken</button><button class="btn btn-secondary" onclick="closeModal('service-detail-modal')">Schließen</button>`;
+  document.getElementById('service-detail-modal').classList.add('open');
+}
+
+function printServiceBooking(id){
+  const b=state.bookings.find(x=>x.id===id);if(!b)return;
+  document.getElementById('print-title').textContent=b.room;
+  document.getElementById('print-meta').textContent=`Standort: ${roomLocationName(b.room)} · ${b.date} ${b.from}–${b.to} · Gedruckt am ${new Date().toLocaleString('de-DE')}`;
+  document.getElementById('print-facts').innerHTML=`
+    <div><div class="print-fact-label">Teilnehmer</div><div class="print-fact-value">${b.participants||1}</div></div>
+    <div><div class="print-fact-label">Kostenstelle</div><div class="print-fact-value">${b.costcenter}</div></div>
+    <div><div class="print-fact-label">Status</div><div class="print-fact-value">${b.status==='pending'?'Ausstehend':'Aktiv'}</div></div>`;
+  document.getElementById('print-note').innerHTML=b.note?`<strong>Bemerkung:</strong> ${b.note}`:'';
+  const rows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<tr><td><span class="print-check"></span></td><td>${pr.name}</td><td>${p.qty} ${pr.unit}</td></tr>`;}).filter(Boolean).join(''):'<tr><td colspan="3">Keine Produkte in dieser Buchung.</td></tr>';
+  document.getElementById('print-products').innerHTML=rows;
+  window.print();
+}
+
+async function advanceDelivery(id,newStatus){
+  const b=state.bookings.find(x=>x.id===id);if(!b)return;
+  b.deliveryStatus=newStatus;
+  showSync('saving','Speichern...');
+  try{await sb('bookings?id=eq.'+id,{method:'PATCH',prefer:'',body:{delivery_status:newStatus}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  renderServiceView();
+}
+
+function openServiceConsumptionModal(id){
+  serviceBookingId=id;
+  const b=state.bookings.find(x=>x.id===id);if(!b)return;
+  document.getElementById('service-info').textContent=`#${b.id} · ${b.room} · ${b.date} ${b.from}–${b.to} · ${b.participants||1} Teilnehmer`;
+  const items=document.getElementById('service-items');
+  if(!b.products?.length){items.innerHTML='<div class="empty">Keine Produkte in dieser Buchung.</div>';document.getElementById('service-modal').classList.add('open');return;}
+  items.innerHTML=b.products.map(p=>{
+    const prod=state.products.find(x=>x.id===p.id);if(!prod)return'';
+    const c=b.billingData?(b.billingData[p.id]??p.qty):p.qty;
+    const ret=p.qty-c;
+    return`<div class="service-item"><div><div style="font-size:13px;font-weight:600">${prod.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${prod.unit}</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${c}" style="width:70px" id="svc-consumed-${p.id}" onchange="updateServiceReturn(${p.id},${p.qty})" onkeyup="updateServiceReturn(${p.id},${p.qty})" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="svc-return-${p.id}">${ret}</div></div>`;
+  }).join('');
+  document.getElementById('service-modal').classList.add('open');
+}
+function updateServiceReturn(pid,qty){
+  const inp=document.getElementById('svc-consumed-'+pid);if(!inp)return;
+  const v=Math.min(qty,Math.max(0,parseInt(inp.value)||0));
+  const el=document.getElementById('svc-return-'+pid);if(el)el.textContent=(qty-v);
+}
+async function saveServiceConsumption(){
+  const b=state.bookings.find(x=>x.id===serviceBookingId);if(!b)return;
+  const bd={};
+  if(b.products)b.products.forEach(p=>{const inp=document.getElementById('svc-consumed-'+p.id);const v=inp?Math.min(p.qty,Math.max(0,parseInt(inp.value)||0)):p.qty;bd[p.id]=v;});
+  b.billingData=bd;
+  showSync('saving','Speichern...');
+  try{await sb('bookings?id=eq.'+b.id,{method:'PATCH',prefer:'',body:{billing_data:bd}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  closeModal('service-modal');renderServiceView();
+}
+
 function renderStammdaten(){
   const n=document.getElementById('mobile-mehr-nav');if(n)n.style.display=window.innerWidth<=600?'flex':'none';
-  renderChips('room-chips',state.rooms,'room');renderChips('ks-chips',state.costcenters,'ks');renderChips('cat-chips',state.categories,'cat');
+  renderLocationChips();
+  renderChips('ks-chips',state.costcenters,'ks');renderChips('cat-chips',state.categories,'cat');
+  renderRoomsTable();
+  renderUsersTable();
 }
 function renderChips(cid,items,type){document.getElementById(cid).innerHTML=items.map((item,i)=>`<div class="chip">${item}<button class="chip-del" onclick="deleteChip('${type}',${i})">×</button></div>`).join('');}
 
-async function addRoom(){const v=document.getElementById('new-room').value.trim();if(!v||state.rooms.includes(v))return;state.rooms.push(v);document.getElementById('new-room').value='';showSync('saving','Speichern...');try{await sb('rooms',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
+function renderLocationChips(){
+  document.getElementById('location-chips').innerHTML=state.locations.map(l=>`<div class="chip">${l.name}<button class="chip-del" onclick="deleteLocation(${l.id})">×</button></div>`).join('');
+}
+
+function renderRoomsTable(){
+  const tbody=document.getElementById('rooms-tbody');if(!tbody)return;
+  tbody.innerHTML=state.rooms.map(r=>{
+    const opts=state.locations.map(l=>`<option value="${l.id}" ${r.location_id===l.id?'selected':''}>${l.name}</option>`).join('');
+    return`<tr><td>${r.name}</td><td><select onchange="updateRoomLocation(${r.id},this.value)" style="width:auto;min-width:160px;"><option value="">— kein Standort —</option>${opts}</select></td><td><button class="btn btn-danger btn-sm" onclick="deleteRoom(${r.id})">✕</button></td></tr>`;
+  }).join('');
+  const sel=document.getElementById('new-room-location');
+  if(sel)sel.innerHTML='<option value="">— kein Standort —</option>'+state.locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+async function addLocation(){
+  const v=document.getElementById('new-location').value.trim();if(!v||state.locations.some(l=>l.name===v))return;
+  document.getElementById('new-location').value='';showSync('saving','Speichern...');
+  try{const r=await sb('locations',{method:'POST',prefer:'return=representation',body:{name:v}});if(r?.[0])state.locations.push(r[0]);showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  renderStammdaten();
+}
+async function deleteLocation(id){
+  if(!confirm('Standort löschen? Zugeordnete Räume und Benutzer verlieren die Zuordnung.'))return;
+  showSync('saving','Speichern...');
+  try{
+    await sb('locations?id=eq.'+id,{method:'DELETE'});
+    state.locations=state.locations.filter(l=>l.id!==id);
+    state.rooms.forEach(r=>{if(r.location_id===id)r.location_id=null;});
+    state.users.forEach(u=>{if(u.location_id===id)u.location_id=null;});
+    showSync('saved','Gelöscht');
+  }catch(e){showSync('error','Fehler');}
+  renderStammdaten();
+}
+
+async function addRoom(){
+  const v=document.getElementById('new-room').value.trim();if(!v||state.rooms.some(r=>r.name===v))return;
+  const locSel=document.getElementById('new-room-location');const location_id=locSel&&locSel.value?parseInt(locSel.value):null;
+  document.getElementById('new-room').value='';showSync('saving','Speichern...');
+  try{const r=await sb('rooms',{method:'POST',prefer:'return=representation',body:{name:v,location_id}});if(r?.[0])state.rooms.push({id:r[0].id,name:v,location_id});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  renderStammdaten();
+}
+async function updateRoomLocation(id,val){
+  const location_id=val?parseInt(val):null;
+  const r=state.rooms.find(x=>x.id===id);if(r)r.location_id=location_id;
+  showSync('saving','Speichern...');
+  try{await sb('rooms?id=eq.'+id,{method:'PATCH',prefer:'',body:{location_id}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+}
+async function deleteRoom(id){
+  if(!confirm('Raum löschen?'))return;
+  showSync('saving','Speichern...');
+  try{await sb('rooms?id=eq.'+id,{method:'DELETE'});state.rooms=state.rooms.filter(x=>x.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}
+  renderStammdaten();
+}
+
 async function addKostenstelle(){const v=document.getElementById('new-ks').value.trim();if(!v||state.costcenters.includes(v))return;state.costcenters.push(v);document.getElementById('new-ks').value='';showSync('saving','Speichern...');try{await sb('costcenters',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
 async function addCategory(){const v=document.getElementById('new-cat').value.trim();if(!v||state.categories.includes(v))return;state.categories.push(v);document.getElementById('new-cat').value='';showSync('saving','Speichern...');try{await sb('categories',{method:'POST',prefer:'resolution=ignore-duplicates',body:{name:v}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}renderStammdaten();}
 async function deleteChip(type,idx){
   showSync('saving','Speichern...');
   try{
-    if(type==='room'){const n=state.rooms[idx];state.rooms.splice(idx,1);await sb('rooms?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
     if(type==='ks'){const n=state.costcenters[idx];state.costcenters.splice(idx,1);await sb('costcenters?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
     if(type==='cat'){const n=state.categories[idx];state.categories.splice(idx,1);await sb('categories?name=eq.'+encodeURIComponent(n),{method:'DELETE'});}
     showSync('saved','Gespeichert');
@@ -850,8 +1191,35 @@ function renderSettings(){
   const n=document.getElementById('mobile-mehr-nav-settings');if(n)n.style.display=window.innerWidth<=600?'flex':'none';
   document.getElementById('setting-timeout').value=state.settings.timeout||30;
   renderQuickSelectSettings();
-  document.getElementById('users-tbody').innerHTML=state.users.map(u=>`<tr><td>${u.name}</td><td><span class="badge ${u.role==='admin'?'badge-active':'badge-pending'}">${u.role}</span></td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">✕</button>`:'—'}</td></tr>`).join('');
   const ms=document.getElementById('admin-migration-section');if(ms)ms.style.display=currentUser?.role==='admin'?'block':'none';
+  const vs=document.getElementById('admin-version-section');if(vs)vs.style.display=currentUser?.role==='admin'?'block':'none';
+  if(state.appMeta){document.getElementById('setting-app-version').value=state.appMeta.version||'';document.getElementById('setting-app-builddate').value=state.appMeta.build_date||'';}
+}
+
+function renderUsersTable(){
+  const t=document.getElementById('users-tbody');if(!t)return;
+  t.innerHTML=state.users.map(u=>{
+    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation(${u.id},this.value)" style="width:auto;min-width:150px;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
+    const roleBadgeClass=u.role==='admin'?'badge-active':u.role==='service'?'badge-done':'badge-pending';
+    const roleLabel=u.role==='admin'?'admin':u.role==='service'?'service':'user';
+    return`<tr><td>${u.name}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id})">✕</button>`:'—'}</td></tr>`;
+  }).join('');
+}
+
+async function saveAppVersion(){
+  const version=document.getElementById('setting-app-version').value.trim();
+  const build_date=document.getElementById('setting-app-builddate').value.trim();
+  if(!version||!build_date){alert('Bitte Version und Datum angeben.');return;}
+  showSync('saving','Speichern...');
+  try{
+    await sb('app_meta?id=eq.1',{method:'PATCH',prefer:'',body:{version,build_date}});
+    state.appMeta={version,build_date};
+    const txt=`// Dashboard ${version}<br>// Stand ${build_date}`;
+    const txtSidebar=`// ${version}<br>// ${build_date}`;
+    document.getElementById('login-version-info').innerHTML=txt;
+    document.getElementById('sidebar-version-info').innerHTML=txtSidebar;
+    showSync('saved','Gespeichert');
+  }catch(e){showSync('error','Fehler');console.error(e);}
 }
 
 // ========== MIGRATION: LocalStorage → Supabase ==========
@@ -949,16 +1317,29 @@ async function importToSupabase(event){
 }
 async function saveSettingsToDB(){state.settings.timeout=parseInt(document.getElementById('setting-timeout').value)||30;await saveGlobalSettings();}
 
-function openUserModal(){document.getElementById('user-name').value='';document.getElementById('user-pin').value='';document.getElementById('user-role').value='user';document.getElementById('user-modal').classList.add('open');}
+function openUserModal(){
+  document.getElementById('user-name').value='';document.getElementById('user-pin').value='';document.getElementById('user-role').value='user';
+  const sel=document.getElementById('user-location');
+  if(sel)sel.innerHTML='<option value="">— keiner —</option>'+state.locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  document.getElementById('user-modal').classList.add('open');
+}
 async function saveUser(){
   const name=document.getElementById('user-name').value.trim(),pin=document.getElementById('user-pin').value.trim(),role=document.getElementById('user-role').value;
+  const locVal=document.getElementById('user-location').value;const location_id=locVal?parseInt(locVal):null;
   if(!name||!pin){alert('Name und PIN erforderlich.');return;}if(state.users.find(u=>u.name.toLowerCase()===name.toLowerCase())){alert('Benutzername bereits vergeben.');return;}
-  showSync('saving','Speichern...');try{const r=await sb('users',{method:'POST',prefer:'return=representation',body:{name,pin,role}});if(r?.[0])state.users.push(r[0]);showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
-  closeModal('user-modal');renderSettings();
+  if((role==='user'||role==='service')&&!location_id&&!confirm('Kein Standort ausgewählt. Dieser Benutzer sieht dann keine Konferenzräume/Buchungen, bis ein Standort zugewiesen wird. Trotzdem speichern?'))return;
+  showSync('saving','Speichern...');try{const r=await sb('users',{method:'POST',prefer:'return=representation',body:{name,pin,role,location_id}});if(r?.[0])state.users.push(r[0]);showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
+  closeModal('user-modal');renderUsersTable();
+}
+async function updateUserLocation(id,val){
+  const location_id=val?parseInt(val):null;
+  const u=state.users.find(x=>x.id===id);if(u)u.location_id=location_id;
+  showSync('saving','Speichern...');
+  try{await sb('users?id=eq.'+id,{method:'PATCH',prefer:'',body:{location_id}});showSync('saved','Gespeichert');}catch(e){showSync('error','Fehler');}
 }
 async function deleteUser(id){
   if(currentUser?.id===id){alert('Eigenen Account nicht löschbar.');return;}if(!confirm('Benutzer löschen?'))return;
-  showSync('saving','Speichern...');try{await sb('users?id=eq.'+id,{method:'DELETE'});state.users=state.users.filter(u=>u.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderSettings();
+  showSync('saving','Speichern...');try{await sb('users?id=eq.'+id,{method:'DELETE'});state.users=state.users.filter(u=>u.id!==id);showSync('saved','Gelöscht');}catch(e){showSync('error','Fehler');}renderUsersTable();
 }
 
 function renderQuickSelectSettings(){
@@ -983,6 +1364,36 @@ function renderBkQuickSelect(){
   const qs=(state.quickSelect||[]).map(id=>state.products.find(p=>p.id===id&&!p.inactive)).filter(Boolean);
   if(!qs.length){c.innerHTML='';return;}
   c.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Schnellauswahl</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">${qs.map(p=>{const qty=window._bkProducts[p.id]||0;return`<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface2);border:1px solid ${qty>0?'var(--accent)':'var(--border)'};min-width:120px;"><div style="flex:1"><div style="font-size:12px;font-weight:700">${p.name}</div><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</div></div><div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},-1)">−</button><span style="font-family:'DM Mono',monospace;font-size:13px;min-width:18px;text-align:center" id="qqty-${p.id}">${qty}</span><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;}).join('')}</div><hr style="border:none;border-top:1px solid var(--border);margin:8px 0 0" />`;
+}
+
+function renderBkAddedProducts(){
+  const container=document.getElementById('bk-added-products');if(!container)return;
+  const added=Object.entries(window._bkProducts||{}).filter(([,q])=>q>0).map(([id,qty])=>{
+    const prod=state.products.find(p=>p.id===parseInt(id));if(!prod)return null;
+    const total=prod.price*qty;
+    return{id:parseInt(id),prod,qty,total};
+  }).filter(Boolean);
+  
+  if(!added.length){container.innerHTML='<div style="font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;">Noch keine Produkte hinzugefügt.</div>';return;}
+  
+  let totalPrice=0;
+  container.innerHTML=added.map(item=>{totalPrice+=item.total;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px;border-radius:2px;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600">${item.prod.name}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${item.prod.price.toFixed(2)} € × ${item.qty} = ${item.total.toFixed(2)} €</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:12px;">
+        <div style="text-align:right;font-family:'DM Mono',monospace;font-weight:600;min-width:80px;">${item.total.toFixed(2)} €</div>
+        <button class="btn-icon" onclick="changeBkQty(${item.id},-${item.qty})" title="Entfernen" style="color:var(--danger)">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  
+  container.innerHTML+=`<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;display:flex;justify-content:space-between;font-size:13px;font-weight:700;">
+    <span>Zwischensumme:</span>
+    <span style="color:var(--accent);font-family:'DM Mono',monospace;">${totalPrice.toFixed(2)} €</span>
+  </div>`;
 }
 
 async function importProductCSV(event){
@@ -1012,8 +1423,8 @@ async function importProductCSV(event){
 function showImportResult(msg,ok){const el=document.getElementById('import-result');el.style.display='block';el.style.borderColor=ok?'var(--green)':'var(--danger)';el.style.color=ok?'var(--green)':'var(--danger)';el.textContent=msg;setTimeout(()=>{el.style.display='none';},5000);}
 
 function exportCSV(){
-  const rows=[['ID','Raum','Datum','Von','Bis','Kostenstelle','Status','Bestellt (€)','Abgerechnet (€)','Abgerechnet am']];
-  state.bookings.forEach(b=>{const tot=b.products?b.products.reduce((s,p)=>{const pr=state.products.find(x=>x.id===p.id);return s+(pr?pr.price*p.qty:0);},0):0;rows.push([b.id,b.room,b.date,b.from,b.to,b.costcenter,b.status,tot.toFixed(2),b.billedTotal?b.billedTotal.toFixed(2):'',b.billedAt?b.billedAt.slice(0,10):'']);});
+  const rows=[['ID','Raum','Standort','Datum','Von','Bis','Kostenstelle','Teilnehmer','Status','Bestellt (€)','Abgerechnet (€)','Abgerechnet am']];
+  visibleBookings().forEach(b=>{const tot=b.products?b.products.reduce((s,p)=>{const pr=state.products.find(x=>x.id===p.id);return s+(pr?pr.price*p.qty:0);},0):0;rows.push([b.id,b.room,roomLocationName(b.room),b.date,b.from,b.to,b.costcenter,b.participants||1,b.status,tot.toFixed(2),b.billedTotal?b.billedTotal.toFixed(2):'',b.billedAt?b.billedAt.slice(0,10):'']);});
   const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='konferenzservice_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
@@ -1024,7 +1435,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function refreshAll(){
   const a=document.querySelector('.nav-item.active')||document.querySelector('.mob-nav-item.active');if(!a)return;
   const v=a.dataset.view||a.dataset.mobview;
-  if(v==='overview')renderOverview();if(v==='bookings')renderBookings();if(v==='billing')renderBillingList();if(v==='products')renderProducts();if(v==='stammdaten')renderStammdaten();
+  if(v==='overview')renderOverview();if(v==='bookings')renderBookings();if(v==='billing')renderBillingList();if(v==='products')renderProducts();if(v==='stammdaten')renderStammdaten();if(v==='service')renderServiceView();if(v==='settings')renderSettings();
 }
 
 function toggleTheme(){const l=document.body.classList.toggle('light');localStorage.setItem('ks_theme',l?'light':'dark');document.querySelectorAll('.theme-toggle').forEach(b=>b.textContent=l?'◑':'◐');}
