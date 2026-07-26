@@ -750,7 +750,13 @@ async function doLogin(){
   const u=document.getElementById('login-user').value.trim();
   const p=document.getElementById('login-pin').value.trim();
   if(!u||!p){document.getElementById('login-error').style.display='block';return;}
-  const email=u.toLowerCase()+'@konferenzservice.internal';
+  let email;
+  try{
+    const rows=await sb('rpc/resolve_login_email',{method:'POST',body:{p_username:u}});
+    email=rows;
+    if(typeof email==='object')email=null;
+  }catch(e){email=null;}
+  if(!email){document.getElementById('login-error').style.display='block';return;}
   const{data,error}=await supa.auth.signInWithPassword({email,password:p});
   if(error||!data?.user){document.getElementById('login-error').style.display='block';return;}
   try{
