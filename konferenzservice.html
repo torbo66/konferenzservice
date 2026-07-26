@@ -71,10 +71,11 @@
   #view-calendar.active{display:flex;flex-direction:column;height:calc(100vh - 64px);gap:10px;}
   #view-calendar .page-header{margin-bottom:0;flex:0 0 auto;}
   #view-calendar #cal-weekdays{flex:0 0 auto;}
-  #view-calendar #cal-days{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(6,1fr);gap:4px;}
+  #view-calendar #cal-days{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:40px repeat(7,1fr);grid-template-rows:repeat(3,1fr);gap:6px;}
   #view-calendar .table-wrap{flex:0 0 auto;max-height:180px;overflow-y:auto;}
   #view-calendar #cal-days{align-items:center;}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-grid{display:grid;grid-template-columns:40px repeat(7,1fr);gap:4px;}
+  .cal-kw-label{display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);font-weight:600;}
   .cal-weekday{text-align:center;font-size:10px;font-family:'DM Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding-bottom:4px;}
   .cal-day{position:relative;width:38px;height:38px;margin:0 auto;display:flex;align-items:center;justify-content:center;border-radius:50%;background:transparent;border:1px solid transparent;cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);transition:all 0.15s;}
   .cal-day:hover{background:var(--surface2);}
@@ -418,14 +419,14 @@
       <div class="page-header">
         <div class="page-title">Kal<span>ender</span></div>
         <div class="flex gap-2" style="align-items:center;">
-          <button class="btn btn-secondary btn-sm" onclick="calMonthShift(-1)">‹</button>
+          <button class="btn btn-secondary btn-sm" onclick="calWeekShift(-1)">‹</button>
           <div id="cal-month-label" style="font-family:'DM Mono',monospace;font-size:13px;min-width:140px;text-align:center;"></div>
-          <button class="btn btn-secondary btn-sm" onclick="calMonthShift(1)">›</button>
+          <button class="btn btn-secondary btn-sm" onclick="calWeekShift(1)">›</button>
           <button class="btn btn-secondary btn-sm" onclick="calGoToday()">Heute</button>
         </div>
       </div>
       <div class="cal-grid" id="cal-weekdays">
-        <div class="cal-weekday">Mo</div><div class="cal-weekday">Di</div><div class="cal-weekday">Mi</div><div class="cal-weekday">Do</div><div class="cal-weekday">Fr</div><div class="cal-weekday">Sa</div><div class="cal-weekday">So</div>
+        <div class="cal-weekday"></div><div class="cal-weekday">Mo</div><div class="cal-weekday">Di</div><div class="cal-weekday">Mi</div><div class="cal-weekday">Do</div><div class="cal-weekday">Fr</div><div class="cal-weekday">Sa</div><div class="cal-weekday">So</div>
       </div>
       <div class="cal-grid" id="cal-days"></div>
       <div class="table-wrap" id="cal-table-wrap">
@@ -853,43 +854,50 @@ function renderBookings(){
   tbody.innerHTML=bk.length?bk.map(b=>bookingRow(b,false)).join(''):'<tr><td colspan="11" class="empty">Keine Buchungen gefunden.</td></tr>';
 }
 
-let calState={year:new Date().getFullYear(),month:new Date().getMonth(),selected:null};
-function calMonthShift(n){
-  calState.month+=n;
-  if(calState.month<0){calState.month=11;calState.year--;}
-  if(calState.month>11){calState.month=0;calState.year++;}
-  calState.selected=null;
-  renderCalendar();
+let calState={weekOffset:0,selected:null};
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function mondayOf(d){const nd=new Date(d);const day=(nd.getDay()+6)%7;nd.setDate(nd.getDate()-day);nd.setHours(0,0,0,0);return nd;}
+function isoWeekNumber(d){
+  const date=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const dayNum=(date.getDay()+6)%7;
+  date.setDate(date.getDate()-dayNum+3);
+  const firstThursday=new Date(date.getFullYear(),0,4);
+  const firstDayNum=(firstThursday.getDay()+6)%7;
+  firstThursday.setDate(firstThursday.getDate()-firstDayNum+3);
+  return 1+Math.round((date-firstThursday)/(7*864e5));
 }
-function calGoToday(){
-  const t=new Date();calState.year=t.getFullYear();calState.month=t.getMonth();calState.selected=t.toISOString().slice(0,10);
-  renderCalendar();
-}
+function calWeekShift(n){calState.weekOffset+=n;calState.selected=null;renderCalendar();}
+function calGoToday(){calState.weekOffset=0;calState.selected=ymd(new Date());renderCalendar();}
 function calDatesWithBookings(){
   const map=new Map();visibleBookings().forEach(b=>{if(b.date)map.set(b.date,(map.get(b.date)||0)+1);});return map;
 }
 function renderCalendar(){
-  const {year,month}=calState;
-  const label=document.getElementById('cal-month-label');
-  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  if(label)label.textContent=monthNames[month]+' '+year;
-  const firstDay=new Date(year,month,1);
-  let startOffset=firstDay.getDay()-1;if(startOffset<0)startOffset=6;
-  const daysInMonth=new Date(year,month+1,0).getDate();
-  const todayStr=new Date().toISOString().slice(0,10);
+  const today=new Date();
+  const anchorMonday=mondayOf(today);anchorMonday.setDate(anchorMonday.getDate()+calState.weekOffset*7);
+  const todayStr=ymd(today);
   const withBk=calDatesWithBookings();
+  const weekStarts=[-1,0,1].map(off=>{const d=new Date(anchorMonday);d.setDate(d.getDate()+off*7);return d;});
   let html='';
-  for(let i=0;i<startOffset;i++)html+='<div class="cal-day empty-day"></div>';
-  for(let d=1;d<=daysInMonth;d++){
-    const dateStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const cnt=withBk.get(dateStr)||0;
-    const cls=['cal-day'];
-    if(cnt>0)cls.push('has-booking');
-    if(dateStr===todayStr)cls.push('today');
-    if(dateStr===calState.selected)cls.push('selected');
-    html+=`<div class="${cls.join(' ')}" onclick="calSelectDay('${dateStr}')">${d}${cnt>0?`<span class="cal-count">${cnt}</span>`:''}</div>`;
-  }
+  weekStarts.forEach(weekStart=>{
+    html+=`<div class="cal-kw-label">KW ${isoWeekNumber(weekStart)}</div>`;
+    for(let i=0;i<7;i++){
+      const d=new Date(weekStart);d.setDate(d.getDate()+i);
+      const dateStr=ymd(d);
+      const cnt=withBk.get(dateStr)||0;
+      const cls=['cal-day'];
+      if(cnt>0)cls.push('has-booking');
+      if(dateStr===todayStr)cls.push('today');
+      if(dateStr===calState.selected)cls.push('selected');
+      html+=`<div class="${cls.join(' ')}" onclick="calSelectDay('${dateStr}')">${d.getDate()}${cnt>0?`<span class="cal-count">${cnt}</span>`:''}</div>`;
+    }
+  });
   document.getElementById('cal-days').innerHTML=html;
+  const label=document.getElementById('cal-month-label');
+  if(label){
+    const rangeEnd=new Date(weekStarts[2]);rangeEnd.setDate(rangeEnd.getDate()+6);
+    const fmt=dt=>dt.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+    label.textContent=fmt(weekStarts[0])+' – '+fmt(rangeEnd)+' '+rangeEnd.getFullYear();
+  }
   calRenderDayList();
 }
 function calSelectDay(dateStr){calState.selected=dateStr;renderCalendar();}
