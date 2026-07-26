@@ -490,7 +490,7 @@
         <div class="table-wrap" style="border:none"><table><thead><tr><th>Raum</th><th>Standort</th><th>Aktionen</th></tr></thead><tbody id="rooms-tbody"></tbody></table></div>
       </div></div>
       <div class="settings-section"><div class="settings-section-header">Benutzer</div><div class="settings-body">
-        <div class="table-wrap" style="border:none"><table><thead><tr><th>Benutzer</th><th>Rolle</th><th>Standort</th><th>Aktionen</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
+        <div class="table-wrap" style="border:none"><table style="table-layout:fixed;"><thead><tr><th style="width:16%;">Benutzername</th><th style="width:18%;">Vorname</th><th style="width:18%;">Nachname</th><th style="width:12%;">Rolle</th><th style="width:22%;">Standort</th><th style="width:14%;">Aktionen</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
         <div style="margin-top:16px"><button class="btn btn-secondary btn-sm" onclick="openUserModal()">+ Benutzer hinzufügen</button></div>
       </div></div>
       <div class="settings-section"><div class="settings-section-header">Produktkategorien</div><div class="settings-body">
@@ -1321,10 +1321,10 @@ function renderSettings(){
 function renderUsersTable(){
   const t=document.getElementById('users-tbody');if(!t)return;
   t.innerHTML=state.users.map(u=>{
-    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:auto;min-width:150px;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
+    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:100%;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
     const roleBadgeClass=u.role==='admin'?'badge-active':u.role==='service'?'badge-done':'badge-pending';
     const roleLabel=u.role==='admin'?'admin':u.role==='service'?'service':'user';
-    return`<tr><td>${u.username}<div class="text-muted" style="font-size:11px;">${u.vorname||''} ${u.nachname||''}</div></td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td><button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">✎</button> ${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:''}</td></tr>`;
+    return`<tr><td>${u.username}</td><td>${u.vorname||''}</td><td>${u.nachname||''}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td><button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">✎</button> ${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:''}</td></tr>`;
   }).join('');
 }
 
