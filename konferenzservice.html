@@ -672,7 +672,7 @@
       <div class="form-group"><label>E-Mail</label><input type="email" id="user-email" placeholder="name@firma.de" /></div>
       <div class="form-group"><label>Rolle</label><select id="user-role"><option value="user">Benutzer</option><option value="service">Service</option><option value="admin">Admin</option></select></div>
       <div class="form-group"><label>Standort</label><select id="user-location"></select></div>
-      <div class="text-muted" style="font-size:12px;margin-top:4px;">Default-Passwort wird automatisch vergeben (EinfachZweifach + aktuelles Jahr), Nutzer muss es beim ersten Login ändern.</div>
+      <div class="text-muted" id="user-pw-hint" style="font-size:12px;margin-top:4px;">Default-Passwort wird automatisch vergeben (EinfachZweifach + aktuelles Jahr), Nutzer muss es beim ersten Login ändern.</div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('user-modal')">Abbrechen</button><button class="btn btn-primary" onclick="saveUser()">Speichern</button></div>
   </div>
@@ -1324,7 +1324,7 @@ function renderUsersTable(){
     const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:auto;min-width:150px;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
     const roleBadgeClass=u.role==='admin'?'badge-active':u.role==='service'?'badge-done':'badge-pending';
     const roleLabel=u.role==='admin'?'admin':u.role==='service'?'service':'user';
-    return`<tr><td>${u.username}<div class="text-muted" style="font-size:11px;">${u.vorname||''} ${u.nachname||''}</div></td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td>${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:'—'}</td></tr>`;
+    return`<tr><td>${u.username}<div class="text-muted" style="font-size:11px;">${u.vorname||''} ${u.nachname||''}</div></td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td><button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">✎</button> ${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:''}</td></tr>`;
   }).join('');
 }
 
@@ -1439,12 +1439,19 @@ async function importToSupabase(event){
 }
 async function saveSettingsToDB(){state.settings.timeout=parseInt(document.getElementById('setting-timeout').value)||30;await saveGlobalSettings();}
 
-function openUserModal(){
-  document.getElementById('user-vorname').value='';document.getElementById('user-nachname').value='';
-  document.getElementById('user-username').value='';document.getElementById('user-email').value='';
-  document.getElementById('user-role').value='user';
+let editingUserId=null;
+function openUserModal(userId){
+  editingUserId=userId||null;
+  const u=editingUserId?state.users.find(x=>x.id===editingUserId):null;
+  document.getElementById('user-vorname').value=u?.vorname||'';
+  document.getElementById('user-nachname').value=u?.nachname||'';
+  document.getElementById('user-username').value=u?.username||'';
+  document.getElementById('user-email').value=u?.email||'';
+  document.getElementById('user-role').value=u?.role||'user';
   const sel=document.getElementById('user-location');
-  if(sel)sel.innerHTML='<option value="">— keiner —</option>'+state.locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  if(sel)sel.innerHTML='<option value="">— keiner —</option>'+state.locations.map(l=>`<option value="${l.id}" ${u?.location_id===l.id?'selected':''}>${l.name}</option>`).join('');
+  document.querySelector('#user-modal .modal-title').textContent=editingUserId?'Benutzer bearbeiten':'Benutzer hinzufügen';
+  document.getElementById('user-pw-hint').style.display=editingUserId?'none':'block';
   document.getElementById('user-modal').classList.add('open');
 }
 async function saveUser(){
@@ -1455,15 +1462,20 @@ async function saveUser(){
   const role=document.getElementById('user-role').value;
   const locVal=document.getElementById('user-location').value;const location_id=locVal?parseInt(locVal):null;
   if(!vorname||!nachname||!username||!email){alert('Vorname, Nachname, Benutzername und E-Mail sind erforderlich.');return;}
-  if(state.users.find(u=>u.username.toLowerCase()===username.toLowerCase())){alert('Benutzername bereits vergeben.');return;}
+  const dup=state.users.find(u=>u.username.toLowerCase()===username.toLowerCase()&&u.id!==editingUserId);
+  if(dup){alert('Benutzername bereits vergeben.');return;}
   if((role==='user'||role==='service')&&!location_id&&!confirm('Kein Standort ausgewählt. Dieser Benutzer sieht dann keine Konferenzräume/Buchungen, bis ein Standort zugewiesen wird. Trotzdem speichern?'))return;
   showSync('saving','Speichern...');
   try{
-    await sb('rpc/admin_create_user',{method:'POST',body:{p_username:username,p_vorname:vorname,p_nachname:nachname,p_email:email,p_role:role,p_location_id:location_id}});
+    if(editingUserId){
+      await sb('rpc/admin_update_user',{method:'POST',body:{p_user_id:editingUserId,p_username:username,p_vorname:vorname,p_nachname:nachname,p_email:email,p_role:role,p_location_id:location_id}});
+    }else{
+      await sb('rpc/admin_create_user',{method:'POST',body:{p_username:username,p_vorname:vorname,p_nachname:nachname,p_email:email,p_role:role,p_location_id:location_id}});
+    }
     const rows=await sb('profiles?select=*&order=username');state.users=rows||[];
     showSync('saved','Gespeichert');
   }catch(e){showSync('error','Fehler — evtl. E-Mail oder Benutzername bereits vergeben.');console.error(e);}
-  closeModal('user-modal');renderUsersTable();
+  closeModal('user-modal');editingUserId=null;renderUsersTable();
 }
 async function updateUserLocation(id,val){
   const location_id=val?parseInt(val):null;
