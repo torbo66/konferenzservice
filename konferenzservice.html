@@ -580,16 +580,16 @@
       <hr class="divider">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:400px;margin-bottom:16px;">
         <!-- LINKE SEITE: Hinzugefügte Produkte -->
-        <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;flex-direction:column;min-height:0;">
           <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent);">Hinzugefügte Produkte</div>
           <div id="bk-added-products" style="background:var(--surface2);border:1px solid var(--border);border-radius:2px;padding:12px;flex:1;overflow-y:auto;">
             <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">Noch keine Produkte hinzugefügt.</div>
           </div>
         </div>
         <!-- RECHTE SEITE: Verfügbare Produkte -->
-        <div style="display:flex;flex-direction:column;">
+        <div style="display:flex;flex-direction:column;min-height:0;">
           <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Verfügbare Produkte</div>
-          <div id="bk-quickselect" style="margin-bottom:10px;"></div>
+          <div id="bk-quickselect" style="margin-bottom:10px;max-height:120px;overflow-y:auto;flex:0 0 auto;"></div>
           <input type="text" id="bk-search" placeholder="Suche nach Name..." oninput="renderBkProducts()" style="margin-bottom:10px;" />
           <select id="bk-cat-select" onchange="setBkFilter(this.value)" style="margin-bottom:10px;width:100%;"></select>
           <div class="product-list" id="bk-product-list" style="flex:1;"></div>
