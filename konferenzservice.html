@@ -578,7 +578,7 @@
       </div>
       <div class="form-group"><label>Bemerkung</label><textarea id="bk-note" placeholder="Optional..." style="resize:vertical;min-height:40px;max-height:60px;overflow-y:auto;"></textarea></div>
       <hr class="divider">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:400px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:520px;margin-bottom:16px;">
         <!-- LINKE SEITE: Hinzugefügte Produkte -->
         <div style="display:flex;flex-direction:column;min-height:0;">
           <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent);">Hinzugefügte Produkte</div>
@@ -589,10 +589,10 @@
         <!-- RECHTE SEITE: Verfügbare Produkte -->
         <div style="display:flex;flex-direction:column;min-height:0;">
           <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Verfügbare Produkte</div>
-          <div id="bk-quickselect" style="margin-bottom:10px;max-height:120px;overflow-y:auto;flex:0 0 auto;"></div>
+          <div id="bk-quickselect" style="margin-bottom:10px;max-height:210px;overflow-y:auto;flex:0 0 auto;"></div>
           <input type="text" id="bk-search" placeholder="Suche nach Name..." oninput="renderBkProducts()" style="margin-bottom:10px;" />
           <select id="bk-cat-select" onchange="setBkFilter(this.value)" style="margin-bottom:10px;width:100%;"></select>
-          <div class="product-list" id="bk-product-list" style="flex:1;"></div>
+          <div class="product-list" id="bk-product-list" style="flex:1;min-height:0;max-height:none;"></div>
         </div>
       </div>
     </div>
