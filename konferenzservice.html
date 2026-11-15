@@ -1191,7 +1191,7 @@ function openServiceDetailModal(id){
 function printServiceBooking(id){
   const b=state.bookings.find(x=>x.id===id);if(!b)return;
   document.getElementById('print-title').textContent=b.room;
-  document.getElementById('print-meta').textContent=`Standort: ${roomLocationName(b.room)} · ${b.date} ${b.from}–${b.to} · Gedruckt am ${new Date().toLocaleString('de-DE')}`;
+  document.getElementById('print-meta').textContent=`Standort: ${roomLocationName(b.room)} · ${b.date} ${b.from}–${b.to} · Gedruckt am ${new Date().toLocaleString('de-DE')} von ${currentUser?.name||'unbekannt'}`;
   document.getElementById('print-facts').innerHTML=`
     <div><div class="print-fact-label">Teilnehmer</div><div class="print-fact-value">${b.participants||1}</div></div>
     <div><div class="print-fact-label">Kostenstelle</div><div class="print-fact-value">${esc(b.costcenter)}</div></div>
