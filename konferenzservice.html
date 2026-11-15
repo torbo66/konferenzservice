@@ -683,6 +683,10 @@
 const SUPA_URL='https://esqztdytskljgksvxesu.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzcXp0ZHl0c2tsamdrc3Z4ZXN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3ODI0NjksImV4cCI6MjA5MjM1ODQ2OX0.6M-9KuAnJKCYZ4QbaibtP5BfLlDiz4nA81I3negWevk';
 const supa=window.supabase.createClient(SUPA_URL,SUPA_KEY,{auth:{persistSession:false,autoRefreshToken:true}});
+// Schutz vor XSS: Texte aus der Datenbank immer maskieren, bevor sie als HTML eingesetzt werden
+function esc(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+// Fuer Texte in onclick="fn('...')": erst fuer JavaScript, dann fuer HTML maskieren
+function escJs(v){return esc(String(v??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r?\n/g,' '));}
 
 async function sb(path,options={}){
   const{data:{session}}=await supa.auth.getSession();
@@ -723,8 +727,8 @@ async function loadAll(){
     if(meta?.[0]){
       const m=meta[0];
       state.appMeta={version:m.version,build_date:m.build_date};
-      const txt=`// Dashboard ${m.version}<br>// Stand ${m.build_date}`;
-      const txtSidebar=`// ${m.version}<br>// ${m.build_date}`;
+      const txt=`// Dashboard ${esc(m.version)}<br>// Stand ${esc(m.build_date)}`;
+      const txtSidebar=`// ${esc(m.version)}<br>// ${esc(m.build_date)}`;
       const lv=document.getElementById('login-version-info');if(lv)lv.innerHTML=txt;
       const sv=document.getElementById('sidebar-version-info');if(sv)sv.innerHTML=txtSidebar;
     }
@@ -939,8 +943,8 @@ function bookingRow(b,compact){
   const loc=roomLocationName(b.room);
   const ac=lk?`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</div>`
     :`<div class="flex gap-2"><button class="btn btn-secondary btn-sm" onclick="openBookingModal(${b.id})">✎</button>${b.status!=='billed'?`<button class="btn btn-secondary btn-sm" onclick="setStatus(${b.id},'${nextStatus(b.status)}')">${nextStatusLabel(b.status)}</button>`:''}${ia&&b.status==='billed'?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">€ Ansehen</button>`:''}<button class="btn btn-danger btn-sm" onclick="deleteBooking(${b.id})">✕</button></div>`;
-  if(compact)return`<tr><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${loc}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date} ${b.from}–${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${ac}</td></tr>`;
-  return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${loc}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.from}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.to}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td style="position:sticky;right:0;background:var(--surface)">${ac}</td></tr>`;
+  if(compact)return`<tr><td>${esc(b.room)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(loc)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(b.date)} ${esc(b.from)}–${esc(b.to)}</td><td>${esc(b.costcenter)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${ac}</td></tr>`;
+  return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${esc(b.room)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(loc)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(b.date)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(b.from)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(b.to)}</td><td>${esc(b.costcenter)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.participants||1}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${cnt} Pos.</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td style="position:sticky;right:0;background:var(--surface)">${ac}</td></tr>`;
 }
 
 function nextStatus(s){return s==='pending'?'active':s==='active'?'done':s==='done'?'billed':'billed';}
@@ -981,7 +985,7 @@ function openBookingModal(id){
 function renderBkCatTabs(){
   const hf=state.favorites?.length>0;const ac=['Alle',...(hf?['★ Favoriten']:[]),...state.categories];
   const sel=document.getElementById('bk-cat-select');if(!sel)return;
-  sel.innerHTML=ac.map(c=>`<option value="${c}" ${currentBkFilter===c||(c==='Alle'&&!currentBkFilter)?'selected':''}>${c}</option>`).join('');
+  sel.innerHTML=ac.map(c=>`<option value="${esc(c)}" ${currentBkFilter===c||(c==='Alle'&&!currentBkFilter)?'selected':''}>${esc(c)}</option>`).join('');
   renderBkProducts();
 }
 function setBkFilter(cat){currentBkFilter=cat==='Alle'?'':cat;renderBkCatTabs();}
@@ -997,7 +1001,7 @@ function renderBkProducts(){
   if(currentBkFilter!=='★ Favoriten')prods.sort((a,b)=>(favs.includes(a.id)?0:1)-(favs.includes(b.id)?0:1));
   if(!prods.length){list.innerHTML='<div class="empty">Keine Produkte gefunden.</div>';return;}
   list.innerHTML=prods.map(p=>{const qty=window._bkProducts[p.id]||0;const iF=favs.includes(p.id);
-    return`<div class="product-item"><div class="product-item-info"><div class="product-item-name"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px 0 0;color:${iF?'#ffb347':'var(--border)'}">${iF?'★':'☆'}</button>${p.name}</div><div class="product-item-cat">${p.category} · ${p.price.toFixed(2)} € / ${p.unit}</div></div><div class="product-qty"><button class="qty-btn" onclick="changeBkQty(${p.id},-1)">−</button><div class="qty-display" id="bkqty-${p.id}">${qty}</div><button class="qty-btn" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;
+    return`<div class="product-item"><div class="product-item-info"><div class="product-item-name"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px 0 0;color:${iF?'#ffb347':'var(--border)'}">${iF?'★':'☆'}</button>${esc(p.name)}</div><div class="product-item-cat">${esc(p.category)} · ${p.price.toFixed(2)} € / ${esc(p.unit)}</div></div><div class="product-qty"><button class="qty-btn" onclick="changeBkQty(${p.id},-1)">−</button><div class="qty-display" id="bkqty-${p.id}">${qty}</div><button class="qty-btn" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;
   }).join('');
 }
 
@@ -1048,7 +1052,7 @@ function renderBillingList(){
     const sm={pending:'badge-pending',active:'badge-active',done:'badge-done',billed:'badge-billed'};
     const sl={pending:'Ausstehend',active:'Aktiv',done:'Abzurechnen',billed:'Abgerechnet'};
     const bi=b.status==='billed'?`<span class="text-green">${(b.billedTotal||0).toFixed(2)} €</span>`:`${tot.toFixed(2)} €`;
-    return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${b.room}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${b.date}</td><td>${b.costcenter}</td><td style="font-family:'DM Mono',monospace">${bi}</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${b.status==='done'?`<button class="btn btn-primary btn-sm" onclick="openBillingModal(${b.id})">Abrechnen</button>`:''}${b.status==='billed'&&ia?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">Ansehen</button>`:''}${b.status==='billed'&&!ia?`<span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</span>`:''}</td></tr>`;
+    return`<tr><td style="font-family:'DM Mono',monospace;font-size:12px">#${b.id}</td><td>${esc(b.room)}</td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(b.date)}</td><td>${esc(b.costcenter)}</td><td style="font-family:'DM Mono',monospace">${bi}</td><td><span class="badge ${sm[b.status]}">${sl[b.status]}</span></td><td>${b.status==='done'?`<button class="btn btn-primary btn-sm" onclick="openBillingModal(${b.id})">Abrechnen</button>`:''}${b.status==='billed'&&ia?`<button class="btn btn-secondary btn-sm" onclick="openBillingModal(${b.id})">Ansehen</button>`:''}${b.status==='billed'&&!ia?`<span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">🔒 gesperrt</span>`:''}</td></tr>`;
   }).join('');
 }
 
@@ -1059,7 +1063,7 @@ function openBillingModal(id){
   const items=document.getElementById('billing-items');
   if(!b.products?.length){items.innerHTML='<div class="empty">Keine Produkte.</div>';document.getElementById('billing-total').textContent='0,00 €';document.getElementById('billing-modal').classList.add('open');return;}
   items.innerHTML=b.products.map(p=>{const prod=state.products.find(x=>x.id===p.id);if(!prod)return'';const c=b.billingData?(b.billingData[p.id]??p.qty):p.qty;
-    return`<div class="billing-item"><div><div style="font-size:13px;font-weight:600">${prod.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${prod.unit} · ${prod.price.toFixed(2)} €</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${prod.price.toFixed(2)} €</div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${c}" style="width:70px" id="bill-consumed-${p.id}" ${ro?'disabled':''} onchange="updateBillingTotal()" onkeyup="updateBillingTotal()" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="bill-line-${p.id}">${(prod.price*c).toFixed(2)} €</div></div>`;
+    return`<div class="billing-item"><div><div style="font-size:13px;font-weight:600">${esc(prod.name)}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${esc(prod.unit)} · ${prod.price.toFixed(2)} €</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${prod.price.toFixed(2)} €</div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${esc(c)}" style="width:70px" id="bill-consumed-${p.id}" ${ro?'disabled':''} onchange="updateBillingTotal()" onkeyup="updateBillingTotal()" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="bill-line-${p.id}">${(prod.price*c).toFixed(2)} €</div></div>`;
   }).join('');
   updateBillingTotal();document.getElementById('billing-modal').classList.add('open');
 }
@@ -1081,13 +1085,13 @@ async function completeBilling(){
 }
 
 function renderProducts(){
-  document.getElementById('product-cat-tabs').innerHTML=['Alle',...state.categories].map(c=>`<div class="cat-tab ${currentProductFilter===c||(c==='Alle'&&!currentProductFilter)?'active':''}" onclick="setProdFilter('${c}')">${c}</div>`).join('');
+  document.getElementById('product-cat-tabs').innerHTML=['Alle',...state.categories].map(c=>`<div class="cat-tab ${currentProductFilter===c||(c==='Alle'&&!currentProductFilter)?'active':''}" onclick="setProdFilter('${escJs(c)}')">${esc(c)}</div>`).join('');
   let prods=state.products;if(currentProductFilter)prods=prods.filter(p=>p.category===currentProductFilter);
   const s=(document.getElementById('prod-search')?.value||'').toLowerCase().trim();if(s)prods=prods.filter(p=>p.name.toLowerCase().includes(s)||(p.plu||'').toLowerCase().includes(s));
   const tbody=document.getElementById('products-tbody');
   if(!prods.length){tbody.innerHTML='<tr><td colspan="6" class="empty">Keine Produkte.</td></tr>';return;}
   tbody.innerHTML=prods.map(p=>{const iF=(state.favorites||[]).includes(p.id);
-    return`<tr id="prod-row-${p.id}" style="${p.inactive?'opacity:0.45':''}"><td style="font-family:'DM Mono',monospace;font-size:12px">${p.plu||'—'}</td><td>${p.name}${p.inactive?' <span class="badge badge-done" style="font-size:10px">inaktiv</span>':''}</td><td><span class="badge badge-pending">${p.category}</span></td><td style="font-family:'DM Mono',monospace;font-size:12px">${p.unit}</td><td style="font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</td><td style="position:sticky;right:0;background:var(--surface);"><div class="flex gap-2" id="prod-actions-${p.id}"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;color:${iF?'#ffb347':'var(--muted)'}">${iF?'★':'☆'}</button><button class="btn btn-secondary btn-sm" onclick="openProductModal(${p.id})">✎</button>${p.inactive?`<button class="btn btn-secondary btn-sm" onclick="reactivateProduct(${p.id})">Aktivieren</button>`:`<button class="btn btn-danger btn-sm" onclick="confirmDeleteProduct(${p.id})">✕</button>`}</div><div class="flex gap-2" id="prod-confirm-${p.id}" style="display:none"><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--danger);align-self:center">Sicher?</span><button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Ja</button><button class="btn btn-secondary btn-sm" onclick="cancelDeleteProduct(${p.id})">Nein</button></div></td></tr>`;
+    return`<tr id="prod-row-${p.id}" style="${p.inactive?'opacity:0.45':''}"><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(p.plu||'—')}</td><td>${esc(p.name)}${p.inactive?' <span class="badge badge-done" style="font-size:10px">inaktiv</span>':''}</td><td><span class="badge badge-pending">${esc(p.category)}</span></td><td style="font-family:'DM Mono',monospace;font-size:12px">${esc(p.unit)}</td><td style="font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</td><td style="position:sticky;right:0;background:var(--surface);"><div class="flex gap-2" id="prod-actions-${p.id}"><button onclick="toggleFavorite(${p.id})" style="background:none;border:none;cursor:pointer;font-size:18px;padding:0 4px;color:${iF?'#ffb347':'var(--muted)'}">${iF?'★':'☆'}</button><button class="btn btn-secondary btn-sm" onclick="openProductModal(${p.id})">✎</button>${p.inactive?`<button class="btn btn-secondary btn-sm" onclick="reactivateProduct(${p.id})">Aktivieren</button>`:`<button class="btn btn-danger btn-sm" onclick="confirmDeleteProduct(${p.id})">✕</button>`}</div><div class="flex gap-2" id="prod-confirm-${p.id}" style="display:none"><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--danger);align-self:center">Sicher?</span><button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Ja</button><button class="btn btn-secondary btn-sm" onclick="cancelDeleteProduct(${p.id})">Nein</button></div></td></tr>`;
   }).join('');
 }
 
@@ -1144,7 +1148,7 @@ function renderServiceView(){
     const ds=b.deliveryStatus||'offen';
     const cnt=b.products?b.products.reduce((s,p)=>s+p.qty,0):0;
     return`<div class="service-list-row" onclick="openServiceDetailModal(${b.id})" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px;cursor:pointer;">
-      <div><div style="font-weight:700;font-size:15px;">${b.room}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${b.date} ${b.from}–${b.to} · ${cnt} Pos.</div></div>
+      <div><div style="font-weight:700;font-size:15px;">${esc(b.room)}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${esc(b.date)} ${esc(b.from)}–${esc(b.to)} · ${cnt} Pos.</div></div>
       <div style="display:flex;gap:8px;align-items:center;"><span class="badge ${sm[b.status]}">${sl[b.status]}</span><span class="badge ${dm[ds]}">${dl[ds]}</span><span style="color:var(--muted);font-size:18px;">›</span></div>
     </div>`;
   }).join(''):'<div class="empty">Keine anstehenden Buchungen.</div>';
@@ -1153,7 +1157,7 @@ function renderServiceView(){
   consEl.innerHTML=consumption.length?consumption.map(b=>{
     const erfasst=b.billingData&&Object.keys(b.billingData).length>0;
     return`<div class="service-list-row" onclick="openServiceConsumptionModal(${b.id})" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:4px;margin-bottom:8px;cursor:pointer;">
-      <div><div style="font-weight:700;font-size:15px;">${b.room}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${b.date} ${b.from}–${b.to} · ${b.participants||1} Teilnehmer</div></div>
+      <div><div style="font-weight:700;font-size:15px;">${esc(b.room)}</div><div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">${esc(b.date)} ${esc(b.from)}–${esc(b.to)} · ${b.participants||1} Teilnehmer</div></div>
       <div style="display:flex;gap:8px;align-items:center;">${erfasst?'<span class="badge badge-done">✓ erfasst</span>':''}<span style="color:var(--muted);font-size:18px;">›</span></div>
     </div>`;
   }).join(''):'<div class="empty">Keine Buchungen zur Verbrauchserfassung. Eine Buchung erscheint hier erst, sobald ein Admin oder Nutzer die Veranstaltung über "Buchungen" als beendet markiert hat.</div>';
@@ -1169,13 +1173,13 @@ function openServiceDetailModal(id){
   document.getElementById('service-detail-title').textContent=b.room;
   document.getElementById('service-detail-badges').innerHTML=`<span class="badge ${sm[b.status]}" style="font-size:12px;padding:5px 10px;margin-right:8px;">${sl[b.status]}</span><span class="badge ${dm[ds]}" style="font-size:12px;padding:5px 10px;">${dl[ds]}</span>`;
   document.getElementById('service-detail-facts').innerHTML=`
-    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Standort</div><div style="font-size:14px;font-weight:600;">${roomLocationName(b.room)}</div></div>
-    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Datum</div><div style="font-size:14px;font-weight:600;">${b.date}</div></div>
-    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Zeit</div><div style="font-size:14px;font-weight:600;">${b.from}–${b.to}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Standort</div><div style="font-size:14px;font-weight:600;">${esc(roomLocationName(b.room))}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Datum</div><div style="font-size:14px;font-weight:600;">${esc(b.date)}</div></div>
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Zeit</div><div style="font-size:14px;font-weight:600;">${esc(b.from)}–${esc(b.to)}</div></div>
     <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Teilnehmer</div><div style="font-size:14px;font-weight:600;">${b.participants||1}</div></div>
-    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Kostenstelle</div><div style="font-size:14px;font-weight:600;">${b.costcenter}</div></div>`;
-  document.getElementById('service-detail-note').innerHTML=b.note?`<div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Bemerkung</div><div style="font-size:14px;">${b.note}</div></div>`:'';
-  const prodRows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;"><span>${pr.name}</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${p.qty} ${pr.unit}</span></div>`;}).filter(Boolean).join(''):'<div class="text-muted" style="padding:8px 0;">Keine Produkte in dieser Buchung.</div>';
+    <div><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Kostenstelle</div><div style="font-size:14px;font-weight:600;">${esc(b.costcenter)}</div></div>`;
+  document.getElementById('service-detail-note').innerHTML=b.note?`<div style="margin-bottom:16px;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px;">Bemerkung</div><div style="font-size:14px;">${esc(b.note)}</div></div>`:'';
+  const prodRows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;"><span>${esc(pr.name)}</span><span style="font-family:'DM Mono',monospace;font-weight:700;">${p.qty} ${esc(pr.unit)}</span></div>`;}).filter(Boolean).join(''):'<div class="text-muted" style="padding:8px 0;">Keine Produkte in dieser Buchung.</div>';
   document.getElementById('service-detail-products').innerHTML=prodRows;
   const footer=document.getElementById('service-detail-footer');
   if(ds==='offen')footer.innerHTML=`<button class="btn btn-secondary" onclick="printServiceBooking(${b.id})">Drucken</button><button class="btn btn-secondary" onclick="closeModal('service-detail-modal')">Schließen</button><button class="btn btn-primary" onclick="advanceDelivery(${b.id},'vorbereitet');closeModal('service-detail-modal')">Vorbereitet</button>`;
@@ -1190,10 +1194,10 @@ function printServiceBooking(id){
   document.getElementById('print-meta').textContent=`Standort: ${roomLocationName(b.room)} · ${b.date} ${b.from}–${b.to} · Gedruckt am ${new Date().toLocaleString('de-DE')}`;
   document.getElementById('print-facts').innerHTML=`
     <div><div class="print-fact-label">Teilnehmer</div><div class="print-fact-value">${b.participants||1}</div></div>
-    <div><div class="print-fact-label">Kostenstelle</div><div class="print-fact-value">${b.costcenter}</div></div>
+    <div><div class="print-fact-label">Kostenstelle</div><div class="print-fact-value">${esc(b.costcenter)}</div></div>
     <div><div class="print-fact-label">Status</div><div class="print-fact-value">${b.status==='pending'?'Ausstehend':'Aktiv'}</div></div>`;
-  document.getElementById('print-note').innerHTML=b.note?`<strong>Bemerkung:</strong> ${b.note}`:'';
-  const rows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<tr><td><span class="print-check"></span></td><td>${pr.name}</td><td>${p.qty} ${pr.unit}</td></tr>`;}).filter(Boolean).join(''):'<tr><td colspan="3">Keine Produkte in dieser Buchung.</td></tr>';
+  document.getElementById('print-note').innerHTML=b.note?`<strong>Bemerkung:</strong> ${esc(b.note)}`:'';
+  const rows=b.products?.length?b.products.map(p=>{const pr=state.products.find(x=>x.id===p.id);if(!pr)return'';return`<tr><td><span class="print-check"></span></td><td>${esc(pr.name)}</td><td>${p.qty} ${esc(pr.unit)}</td></tr>`;}).filter(Boolean).join(''):'<tr><td colspan="3">Keine Produkte in dieser Buchung.</td></tr>';
   document.getElementById('print-products').innerHTML=rows;
   window.print();
 }
@@ -1216,7 +1220,7 @@ function openServiceConsumptionModal(id){
     const prod=state.products.find(x=>x.id===p.id);if(!prod)return'';
     const c=b.billingData?(b.billingData[p.id]??p.qty):p.qty;
     const ret=p.qty-c;
-    return`<div class="service-item"><div><div style="font-size:13px;font-weight:600">${prod.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${prod.unit}</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${c}" style="width:70px" id="svc-consumed-${p.id}" onchange="updateServiceReturn(${p.id},${p.qty})" onkeyup="updateServiceReturn(${p.id},${p.qty})" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="svc-return-${p.id}">${ret}</div></div>`;
+    return`<div class="service-item"><div><div style="font-size:13px;font-weight:600">${esc(prod.name)}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${esc(prod.unit)}</div></div><div style="font-family:'DM Mono',monospace;font-size:13px">${p.qty}</div><div><input type="number" min="0" max="${p.qty}" value="${esc(c)}" style="width:70px" id="svc-consumed-${p.id}" onchange="updateServiceReturn(${p.id},${p.qty})" onkeyup="updateServiceReturn(${p.id},${p.qty})" /></div><div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)" id="svc-return-${p.id}">${ret}</div></div>`;
   }).join('');
   document.getElementById('service-modal').classList.add('open');
 }
@@ -1242,20 +1246,20 @@ function renderStammdaten(){
   renderRoomsTable();
   renderUsersTable();
 }
-function renderChips(cid,items,type){document.getElementById(cid).innerHTML=items.map((item,i)=>`<div class="chip">${item}<button class="chip-del" onclick="deleteChip('${type}',${i})">×</button></div>`).join('');}
+function renderChips(cid,items,type){document.getElementById(cid).innerHTML=items.map((item,i)=>`<div class="chip">${esc(item)}<button class="chip-del" onclick="deleteChip('${type}',${i})">×</button></div>`).join('');}
 
 function renderLocationChips(){
-  document.getElementById('location-chips').innerHTML=state.locations.map(l=>`<div class="chip">${l.name}<button class="chip-del" onclick="deleteLocation(${l.id})">×</button></div>`).join('');
+  document.getElementById('location-chips').innerHTML=state.locations.map(l=>`<div class="chip">${esc(l.name)}<button class="chip-del" onclick="deleteLocation(${l.id})">×</button></div>`).join('');
 }
 
 function renderRoomsTable(){
   const tbody=document.getElementById('rooms-tbody');if(!tbody)return;
   tbody.innerHTML=state.rooms.map(r=>{
-    const opts=state.locations.map(l=>`<option value="${l.id}" ${r.location_id===l.id?'selected':''}>${l.name}</option>`).join('');
-    return`<tr><td>${r.name}</td><td><select onchange="updateRoomLocation(${r.id},this.value)" style="width:auto;min-width:160px;"><option value="">— kein Standort —</option>${opts}</select></td><td><button class="btn btn-danger btn-sm" onclick="deleteRoom(${r.id})">✕</button></td></tr>`;
+    const opts=state.locations.map(l=>`<option value="${l.id}" ${r.location_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
+    return`<tr><td>${esc(r.name)}</td><td><select onchange="updateRoomLocation(${r.id},this.value)" style="width:auto;min-width:160px;"><option value="">— kein Standort —</option>${opts}</select></td><td><button class="btn btn-danger btn-sm" onclick="deleteRoom(${r.id})">✕</button></td></tr>`;
   }).join('');
   const sel=document.getElementById('new-room-location');
-  if(sel)sel.innerHTML='<option value="">— kein Standort —</option>'+state.locations.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+  if(sel)sel.innerHTML='<option value="">— kein Standort —</option>'+state.locations.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('');
 }
 
 async function addLocation(){
@@ -1321,10 +1325,10 @@ function renderSettings(){
 function renderUsersTable(){
   const t=document.getElementById('users-tbody');if(!t)return;
   t.innerHTML=state.users.map(u=>{
-    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:100%;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${l.name}</option>`).join('')}</select>`;
+    const locCell=u.role==='admin'?'<span class="text-muted" style="font-size:12px;">Alle</span>':`<select onchange="updateUserLocation('${u.id}',this.value)" style="width:100%;"><option value="">— keiner —</option>${state.locations.map(l=>`<option value="${l.id}" ${u.location_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('')}</select>`;
     const roleBadgeClass=u.role==='admin'?'badge-active':u.role==='service'?'badge-done':'badge-pending';
     const roleLabel=u.role==='admin'?'admin':u.role==='service'?'service':'user';
-    return`<tr><td>${u.username}</td><td>${u.vorname||''}</td><td>${u.nachname||''}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td><button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">✎</button> ${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:''}</td></tr>`;
+    return`<tr><td>${esc(u.username)}</td><td>${esc(u.vorname||'')}</td><td>${esc(u.nachname||'')}</td><td><span class="badge ${roleBadgeClass}">${roleLabel}</span></td><td>${locCell}</td><td><button class="btn btn-secondary btn-sm" onclick="openUserModal('${u.id}')">✎</button> ${state.users.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">✕</button>`:''}</td></tr>`;
   }).join('');
 }
 
@@ -1336,8 +1340,8 @@ async function saveAppVersion(){
   try{
     await sb('app_meta?id=eq.1',{method:'PATCH',prefer:'',body:{version,build_date}});
     state.appMeta={version,build_date};
-    const txt=`// Dashboard ${version}<br>// Stand ${build_date}`;
-    const txtSidebar=`// ${version}<br>// ${build_date}`;
+    const txt=`// Dashboard ${esc(version)}<br>// Stand ${esc(build_date)}`;
+    const txtSidebar=`// ${esc(version)}<br>// ${esc(build_date)}`;
     document.getElementById('login-version-info').innerHTML=txt;
     document.getElementById('sidebar-version-info').innerHTML=txtSidebar;
     showSync('saved','Gespeichert');
@@ -1360,7 +1364,7 @@ function log(msg,type='info'){
   const box=document.getElementById('migration-log');if(!box)return;
   box.style.display='block';
   const colors={info:'var(--muted)',ok:'var(--green)',warn:'var(--orange)',err:'var(--danger)'};
-  box.innerHTML+=`<div style="color:${colors[type]||colors.info}">${new Date().toLocaleTimeString('de')} — ${msg}</div>`;
+  box.innerHTML+=`<div style="color:${colors[type]||colors.info}">${new Date().toLocaleTimeString('de')} — ${esc(msg)}</div>`;
   box.scrollTop=box.scrollHeight;
 }
 
@@ -1449,7 +1453,7 @@ function openUserModal(userId){
   document.getElementById('user-email').value=u?.email||'';
   document.getElementById('user-role').value=u?.role||'user';
   const sel=document.getElementById('user-location');
-  if(sel)sel.innerHTML='<option value="">— keiner —</option>'+state.locations.map(l=>`<option value="${l.id}" ${u?.location_id===l.id?'selected':''}>${l.name}</option>`).join('');
+  if(sel)sel.innerHTML='<option value="">— keiner —</option>'+state.locations.map(l=>`<option value="${l.id}" ${u?.location_id===l.id?'selected':''}>${esc(l.name)}</option>`).join('');
   document.querySelector('#user-modal .modal-title').textContent=editingUserId?'Benutzer bearbeiten':'Benutzer hinzufügen';
   document.getElementById('user-pw-hint').style.display=editingUserId?'none':'block';
   document.getElementById('user-modal').classList.add('open');
@@ -1493,11 +1497,11 @@ async function deleteUser(id){
 function renderQuickSelectSettings(){
   const sel=document.getElementById('qs-prod-select');if(!sel)return;
   const qs=state.quickSelect||[];const av=state.products.filter(p=>!p.inactive&&!qs.includes(p.id));
-  sel.innerHTML=av.length?av.map(p=>`<option value="${p.id}">${p.name} (${p.plu||'—'})</option>`).join(''):'<option value="">Alle hinzugefügt</option>';
+  sel.innerHTML=av.length?av.map(p=>`<option value="${p.id}">${esc(p.name)} (${esc(p.plu||'—')})</option>`).join(''):'<option value="">Alle hinzugefügt</option>';
   const list=document.getElementById('qs-list');
   if(!qs.length){list.innerHTML='<div style="font-size:12px;color:var(--muted);font-family:\'DM Mono\',monospace;">Noch keine Produkte hinzugefügt.</div>';return;}
   list.innerHTML=qs.map((id,i)=>{const p=state.products.find(x=>x.id===id);if(!p)return'';
-    return`<div class="qs-item" draggable="true" data-id="${id}" data-idx="${i}" ondragstart="qsDragStart(event)" ondragover="qsDragOver(event)" ondrop="qsDrop(event)" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);cursor:grab;"><span style="color:var(--muted);font-size:16px;">⠿</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${p.plu||'—'} · ${p.price.toFixed(2)} € / ${p.unit}</div></div><button class="btn btn-danger btn-sm" onclick="removeQuickSelect(${id})">✕</button></div>`;
+    return`<div class="qs-item" draggable="true" data-id="${id}" data-idx="${i}" ondragstart="qsDragStart(event)" ondragover="qsDragOver(event)" ondrop="qsDrop(event)" style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);cursor:grab;"><span style="color:var(--muted);font-size:16px;">⠿</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${esc(p.name)}</div><div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${esc(p.plu||'—')} · ${p.price.toFixed(2)} € / ${esc(p.unit)}</div></div><button class="btn btn-danger btn-sm" onclick="removeQuickSelect(${id})">✕</button></div>`;
   }).join('');
 }
 async function addQuickSelect(){const id=parseInt(document.getElementById('qs-prod-select').value);if(!id)return;if(!state.quickSelect)state.quickSelect=[];if(!state.quickSelect.includes(id))state.quickSelect.push(id);await saveGlobalSettings();renderQuickSelectSettings();}
@@ -1511,7 +1515,7 @@ function renderBkQuickSelect(){
   const c=document.getElementById('bk-quickselect');if(!c)return;
   const qs=(state.quickSelect||[]).map(id=>state.products.find(p=>p.id===id&&!p.inactive)).filter(Boolean);
   if(!qs.length){c.innerHTML='';return;}
-  c.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Schnellauswahl</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">${qs.map(p=>{const qty=window._bkProducts[p.id]||0;return`<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface2);border:1px solid ${qty>0?'var(--accent)':'var(--border)'};min-width:120px;"><div style="flex:1"><div style="font-size:12px;font-weight:700">${p.name}</div><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</div></div><div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},-1)">−</button><span style="font-family:'DM Mono',monospace;font-size:13px;min-width:18px;text-align:center" id="qqty-${p.id}">${qty}</span><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;}).join('')}</div><hr style="border:none;border-top:1px solid var(--border);margin:8px 0 0" />`;
+  c.innerHTML=`<div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Schnellauswahl</div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">${qs.map(p=>{const qty=window._bkProducts[p.id]||0;return`<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:var(--surface2);border:1px solid ${qty>0?'var(--accent)':'var(--border)'};min-width:120px;"><div style="flex:1"><div style="font-size:12px;font-weight:700">${esc(p.name)}</div><div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace">${p.price.toFixed(2)} €</div></div><div style="display:flex;align-items:center;gap:4px;"><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},-1)">−</button><span style="font-family:'DM Mono',monospace;font-size:13px;min-width:18px;text-align:center" id="qqty-${p.id}">${qty}</span><button class="qty-btn" style="width:24px;height:24px;font-size:14px" onclick="changeBkQty(${p.id},1)">+</button></div></div>`;}).join('')}</div><hr style="border:none;border-top:1px solid var(--border);margin:8px 0 0" />`;
 }
 
 function renderBkAddedProducts(){
@@ -1528,7 +1532,7 @@ function renderBkAddedProducts(){
   container.innerHTML=added.map(item=>{totalPrice+=item.total;
     return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--surface);border:1px solid var(--border);margin-bottom:6px;border-radius:2px;">
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600">${item.prod.name}</div>
+        <div style="font-size:13px;font-weight:600">${esc(item.prod.name)}</div>
         <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace">${item.prod.price.toFixed(2)} € × ${item.qty} = ${item.total.toFixed(2)} €</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;margin-left:12px;">
@@ -1577,8 +1581,8 @@ function exportCSV(){
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='konferenzservice_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
 }
 
-function populateSelect(id,items){document.getElementById(id).innerHTML=items.map(i=>`<option value="${i}">${i}</option>`).join('');}
-function populateFilter(id,items){const el=document.getElementById(id);const cur=el.value;el.innerHTML='<option value="">Alle</option>'+items.map(i=>`<option value="${i}">${i}</option>`).join('');el.value=cur;}
+function populateSelect(id,items){document.getElementById(id).innerHTML=items.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');}
+function populateFilter(id,items){const el=document.getElementById(id);const cur=el.value;el.innerHTML='<option value="">Alle</option>'+items.map(i=>`<option value="${esc(i)}">${esc(i)}</option>`).join('');el.value=cur;}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function refreshAll(){
   const a=document.querySelector('.nav-item.active')||document.querySelector('.mob-nav-item.active');if(!a)return;
@@ -1594,7 +1598,7 @@ function toggleTheme(){const l=document.body.classList.toggle('light');localStor
     const meta=await sb('app_meta?select=*&id=eq.1');
     if(meta?.[0]){
       const m=meta[0];
-      const lv=document.getElementById('login-version-info');if(lv)lv.innerHTML=`// Dashboard ${m.version}<br>// Stand ${m.build_date}`;
+      const lv=document.getElementById('login-version-info');if(lv)lv.innerHTML=`// Dashboard ${esc(m.version)}<br>// Stand ${esc(m.build_date)}`;
     }
     document.getElementById('loading-overlay').classList.add('hidden');
     document.getElementById('login-screen').style.display='flex';
